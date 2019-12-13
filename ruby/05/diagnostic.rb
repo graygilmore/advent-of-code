@@ -8,14 +8,13 @@ class PartOne
     @instruction_pointer = 0
   end
 
-  def solution
+  def solution(unit_id)
     program_running = true
-    input_instruction = 1 # for the ship's air conditioner unit
 
     while program_running
       opcode_instructions = @program[@instruction_pointer].digits
       opcode = opcode_instructions.take(2).reverse.join('').to_i
-
+      puts opcode
       case opcode
       when 1
         @program[parameter(3, 1)] = parameter(1) + parameter(2)
@@ -24,11 +23,29 @@ class PartOne
         @program[parameter(3, 1)] = parameter(1) * parameter(2)
         @instruction_pointer += 4
       when 3
-        @program[parameter(1, 1)] = input_instruction
+        @program[parameter(1, 1)] = unit_id
         @instruction_pointer += 2
       when 4
         puts parameter(1)
         @instruction_pointer += 2
+      when 5
+        if parameter(1) != 0
+          @instruction_pointer = parameter(2)
+        else
+          @instruction_pointer += 3
+        end
+      when 6
+        if parameter(1) == 0
+          @instruction_pointer = parameter(2)
+        else
+          @instruction_pointer += 3
+        end
+      when 7
+        @program[parameter(3, 1)] = parameter(1) < parameter(2) ? 1 : 0
+        @instruction_pointer += 4
+      when 8
+        @program[parameter(3, 1)] = parameter(1) == parameter(2) ? 1 : 0
+        @instruction_pointer += 4
       when 99
         program_running = false
       else
@@ -59,18 +76,5 @@ class PartOne
   end
 end
 
-class PartTwo < PartOne
-  def solution
-  end
-end
-
-class TestFuel < Minitest::Test
-  def test_part_one
-  end
-
-  def test_part_two
-  end
-end
-
-puts "Part One: #{::PartOne.new.solution}"
-# puts "Part Two: #{::PartTwo.new.solution}"
+puts "Part One: #{::PartOne.new.solution(1)}"
+puts "Part Two: #{::PartOne.new.solution(5)}"
