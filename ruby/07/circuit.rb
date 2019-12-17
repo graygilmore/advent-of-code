@@ -3,14 +3,15 @@ require 'minitest/autorun'
 require 'pathname'
 
 class Intcode
-  def initialize(program, inputs)
-    @program = program
-    @inputs = inputs
+  def initialize(program, input, rerun = false)
+    @program = program.dup
+    @input = input
+    @rerun = rerun
     @output = nil
     @instruction_pointer = 0
   end
 
-  def call
+  def call(new_input = nil)
     loop do
       opcode_instructions = @program[@instruction_pointer].digits
       opcode = opcode_instructions.take(2).reverse.join('').to_i
@@ -23,12 +24,17 @@ class Intcode
         @program[parameter(3, 1)] = parameter(1) * parameter(2)
         @instruction_pointer += 4
       when 3
-        input = @inputs.shift
+        input = @input ? @input : new_input
         @program[parameter(1, 1)] = input
         @instruction_pointer += 2
+        @input = nil
       when 4
         @output = parameter(1)
         @instruction_pointer += 2
+
+        if @rerun
+          return [@output, false] # returning array stolen from adammathys <3
+        end
       when 5
         if parameter(1) != 0
           @instruction_pointer = parameter(2)
@@ -48,7 +54,7 @@ class Intcode
         @program[parameter(3, 1)] = parameter(1) == parameter(2) ? 1 : 0
         @instruction_pointer += 4
       when 99
-        return @output
+        return [@output, true]
       else
         raise "bad opcode #{opcode}"
       end
@@ -80,13 +86,13 @@ class PartOne
       [0,1,2,3,4].permutation.map do |sequence|
         @second_input = 0
         sequence.map do |i|
-          @second_input = Intcode.new(@program, [i, @second_input]).()
+          @second_input = Intcode.new(@program, i).(@second_input)[0]
         end.last
       end.max
     else
       @second_input = 0
       @sequence.map do |i|
-        @second_input = Intcode.new(@program, [i, @second_input]).()
+        @second_input = Intcode.new(@program, i).(@second_input)[0]
       end.last
     end
   end
@@ -104,6 +110,39 @@ end
 
 class PartTwo < PartOne
   def solution
+    if !@sequence
+      [5,6,7,8,9].permutation.map do |sequence|
+        run_permutation(sequence)
+      end.max
+    else
+      run_permutation(@sequence)
+    end
+  end
+
+  private
+
+  def run_permutation(permutation)
+    @running = true
+    @last_output = 0
+    @first_run = true
+
+    intcodes = permutation.map do |i|
+      [i, Intcode.new(@program, i, true)]
+    end.to_h
+
+    while @running do
+      permutation.each do |i|
+        output = intcodes[i].call(@first_run ? 0 : @last_output)
+        @first_run = false
+
+        if output[1]
+          @running = false
+          return @last_output
+        else
+          @last_output = output[0]
+        end
+      end
+    end
   end
 end
 
@@ -122,17 +161,17 @@ class TestCircuit < Minitest::Test
   end
 
   def test_part_two
-    # assert_equal 139629729, PartTwo.new([
-    #   3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,
-    #   28,6,99,0,0,5
-    # ], [9,8,7,6,5]).solution
-    # assert_equal 18216, PartTwo.new([
-    #   3,52,1001,52,-5,52,3,53,1,52,56,54,1007,54,5,55,1005,55,26,1001,54,-5,54,
-    #   1105,1,12,1,53,54,53,1008,54,0,55,1001,55,1,55,2,53,55,53,4,53,1001,56,-1,
-    #   56,1005,56,6,99,0,0,0,0,10
-    # ], [9,7,8,5,6]).solution
+    assert_equal 139629729, PartTwo.new([
+      3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,
+      28,6,99,0,0,5
+    ], [9,8,7,6,5]).solution
+    assert_equal 18216, PartTwo.new([
+      3,52,1001,52,-5,52,3,53,1,52,56,54,1007,54,5,55,1005,55,26,1001,54,-5,54,
+      1105,1,12,1,53,54,53,1008,54,0,55,1001,55,1,55,2,53,55,53,4,53,1001,56,-1,
+      56,1005,56,6,99,0,0,0,0,10
+    ], [9,7,8,5,6]).solution
   end
 end
 
 puts "Part One: #{::PartOne.new.solution}"
-# puts "Part One: #{::PartTwo.new.solution}"
+puts "Part Two: #{::PartTwo.new.solution}"
