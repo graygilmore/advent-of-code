@@ -1,35 +1,16 @@
 require 'pry'
-require "minitest/autorun"
+require 'minitest/autorun'
 require 'pathname'
 
-class PartOne
-  def initialize(program = input, sequence = nil)
+class Intcode
+  def initialize(program, inputs)
     @program = program
-    @sequence = sequence
-  end
-
-  def solution
-    if !@sequence
-      [0,1,2,3,4].permutation.map do |sequence|
-        @second_input = 0
-        sequence.map do |i|
-          @second_input = intcode([i, @second_input])
-        end.last
-      end.max
-    else
-      @second_input = 0
-      @sequence.map do |i|
-        @second_input = intcode([i, @second_input])
-      end.last
-    end
-  end
-
-  private
-
-  def intcode(inputs)
-    @last_output = 0
+    @inputs = inputs
+    @output = nil
     @instruction_pointer = 0
+  end
 
+  def call
     loop do
       opcode_instructions = @program[@instruction_pointer].digits
       opcode = opcode_instructions.take(2).reverse.join('').to_i
@@ -42,11 +23,11 @@ class PartOne
         @program[parameter(3, 1)] = parameter(1) * parameter(2)
         @instruction_pointer += 4
       when 3
-        @program[parameter(1, 1)] = inputs.shift
+        input = @inputs.shift
+        @program[parameter(1, 1)] = input
         @instruction_pointer += 2
       when 4
-        output = parameter(1)
-        @last_output = output
+        @output = parameter(1)
         @instruction_pointer += 2
       when 5
         if parameter(1) != 0
@@ -67,20 +48,14 @@ class PartOne
         @program[parameter(3, 1)] = parameter(1) == parameter(2) ? 1 : 0
         @instruction_pointer += 4
       when 99
-        return @last_output
+        return @output
       else
         raise "bad opcode #{opcode}"
       end
     end
   end
 
-  def input
-    @input ||=
-      begin
-        path = File.expand_path(File.dirname(__FILE__))
-        File.read(Pathname.new(path).join("input.txt")).chomp.split(',').map(&:chomp).map(&:to_i)
-      end
-  end
+  private
 
   def position_mode(n)
     @program[@instruction_pointer].digits[n + 1] || 0
@@ -91,6 +66,39 @@ class PartOne
 
     parameter_value = @program[@instruction_pointer + n]
     pmode === 0 ? @program[parameter_value] : parameter_value
+  end
+end
+
+class PartOne
+  def initialize(program = input, sequence = nil)
+    @program = program
+    @sequence = sequence
+  end
+
+  def solution
+    if !@sequence
+      [0,1,2,3,4].permutation.map do |sequence|
+        @second_input = 0
+        sequence.map do |i|
+          @second_input = Intcode.new(@program, [i, @second_input]).()
+        end.last
+      end.max
+    else
+      @second_input = 0
+      @sequence.map do |i|
+        @second_input = Intcode.new(@program, [i, @second_input]).()
+      end.last
+    end
+  end
+
+  private
+
+  def input
+    @input ||=
+      begin
+        path = File.expand_path(File.dirname(__FILE__))
+        File.read(Pathname.new(path).join("input.txt")).chomp.split(',').map(&:chomp).map(&:to_i)
+      end
   end
 end
 
@@ -113,9 +121,17 @@ class TestCircuit < Minitest::Test
     ], [1,0,4,3,2]).solution
   end
 
-  # def test_part_two
-  #   assert_equal true, PartTwo.new().solution
-  # end
+  def test_part_two
+    # assert_equal 139629729, PartTwo.new([
+    #   3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,
+    #   28,6,99,0,0,5
+    # ], [9,8,7,6,5]).solution
+    # assert_equal 18216, PartTwo.new([
+    #   3,52,1001,52,-5,52,3,53,1,52,56,54,1007,54,5,55,1005,55,26,1001,54,-5,54,
+    #   1105,1,12,1,53,54,53,1008,54,0,55,1001,55,1,55,2,53,55,53,4,53,1001,56,-1,
+    #   56,1005,56,6,99,0,0,0,0,10
+    # ], [9,7,8,5,6]).solution
+  end
 end
 
 puts "Part One: #{::PartOne.new.solution}"
