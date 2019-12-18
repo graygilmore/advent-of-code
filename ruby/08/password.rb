@@ -40,6 +40,17 @@ end
 
 class PartTwo < PartOne
   def solution
+    decoded_image
+  end
+
+  def pretty_print
+    # thanks again, Adam! <3
+    decoded_image.gsub('1', "█").gsub('0', "░")
+  end
+
+  private
+
+  def decoded_image
     image = layers.slice(0)
     layers.each do |layer|
       image.each_with_index do |_digit, i|
@@ -64,3 +75,4 @@ end
 
 puts "Part One: #{::PartOne.new.solution}"
 puts "Part Two: \n#{::PartTwo.new.solution}"
+puts "Pretty Print: \n#{::PartTwo.new.pretty_print}"
