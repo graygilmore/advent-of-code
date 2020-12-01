@@ -10,9 +10,7 @@ class Calculator
 
   def solution
     @expense_report.combination(@count) do |items|
-      if items.sum == 2020
-        return items.inject(:*)
-      end
+      return items.inject(:*) if items.sum == 2020
     end
   end
 
