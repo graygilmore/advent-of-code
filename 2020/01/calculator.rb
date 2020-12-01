@@ -8,7 +8,7 @@ class PartOne
   end
 
   def solution
-    @expense_report.permutation(2) do |x,y|
+    @expense_report.combination(2) do |x,y|
       if x + y == 2020
         return x * y
       end
@@ -28,7 +28,7 @@ end
 
 class PartTwo < PartOne
   def solution
-    @expense_report.permutation(3) do |x,y,z|
+    @expense_report.combination(3) do |x,y,z|
       if x + y + z == 2020
         return x * y * z
       end
