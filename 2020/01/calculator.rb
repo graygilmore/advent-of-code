@@ -26,10 +26,25 @@ class PartOne
   end
 end
 
+class PartTwo < PartOne
+  def solution
+    @expense_report.permutation(3) do |x,y,z|
+      if x + y + z == 2020
+        return x * y * z
+      end
+    end
+  end
+end
+
 class TestFuel < Minitest::Test
   def test_part_one
     assert_equal 514579, PartOne.new([1721, 979, 366, 299, 675, 1456]).solution
   end
+
+  def test_part_two
+    assert_equal 241861950, PartTwo.new([1721, 979, 366, 299, 675, 1456]).solution
+  end
 end
 
 puts "Part One: #{::PartOne.new.solution}"
+puts "Part Two: #{::PartTwo.new.solution}"
