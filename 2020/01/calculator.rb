@@ -2,15 +2,16 @@ require 'pry'
 require "minitest/autorun"
 require 'pathname'
 
-class PartOne
-  def initialize(expense_report = input)
+class Calculator
+  def initialize(count = 2, expense_report = input)
+    @count = count
     @expense_report = expense_report
   end
 
   def solution
-    @expense_report.combination(2) do |x,y|
-      if x + y == 2020
-        return x * y
+    @expense_report.combination(@count) do |items|
+      if items.sum == 2020
+        return items.inject(:*)
       end
     end
   end
@@ -26,25 +27,15 @@ class PartOne
   end
 end
 
-class PartTwo < PartOne
-  def solution
-    @expense_report.combination(3) do |x,y,z|
-      if x + y + z == 2020
-        return x * y * z
-      end
-    end
-  end
-end
-
-class TestFuel < Minitest::Test
+class TestCalculator < Minitest::Test
   def test_part_one
-    assert_equal 514579, PartOne.new([1721, 979, 366, 299, 675, 1456]).solution
+    assert_equal 514579, Calculator.new(2, [1721, 979, 366, 299, 675, 1456]).solution
   end
 
   def test_part_two
-    assert_equal 241861950, PartTwo.new([1721, 979, 366, 299, 675, 1456]).solution
+    assert_equal 241861950, Calculator.new(3, [1721, 979, 366, 299, 675, 1456]).solution
   end
 end
 
-puts "Part One: #{::PartOne.new.solution}"
-puts "Part Two: #{::PartTwo.new.solution}"
+puts "Part One: #{::Calculator.new(2).solution}"
+puts "Part Two: #{::Calculator.new(3).solution}"
