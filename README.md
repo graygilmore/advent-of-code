@@ -6,4 +6,4 @@ https://adventofcode.com
 
 1. Make sure you have Ruby 2.7.2 and Bundler installed
 1. Run `bundle install`
-1. Run `ruby file_name.rb` (e.g., `ruby 2020/01/calculator.rb`)
+1. Run `bundle exec ruby file_name.rb` (e.g., `ruby 2020/01/calculator.rb`)
