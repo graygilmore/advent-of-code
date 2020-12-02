@@ -3,24 +3,40 @@ require "minitest/autorun"
 require 'pathname'
 
 class PartOne
-  def initialize(password_list = input)
-    @password_list = password_list
+  def initialize(input = file_input)
+    @input = input
   end
 
   def solution
-    @password_list.select do |password_item|
-      rules, password = password_item.split(': ')
-      limit_range, required_letter = rules.split(' ')
-      limit_min, limit_max = limit_range.split('-').map(&:to_i)
-
-      password.count(required_letter) >= limit_min && password.count(required_letter) <= limit_max
-    end.count
+    passwords.count { |password| valid?(password) }
   end
 
   private
 
-  def input
-    @input ||=
+  attr_reader :input, :passwords
+
+  def valid?(password)
+    password[:value].count(password[:required_letter]) >= password[:range_begin] &&
+      password[:value].count(password[:required_letter]) <= password[:range_end]
+  end
+
+  def passwords
+    @passwords ||= begin
+      input.map do |data|
+        range, required_letter, value = data.split(' ')
+
+        {
+          range_begin: range.split('-')[0].to_i,
+          range_end: range.split('-')[1].to_i,
+          required_letter: required_letter.gsub(':', ''),
+          value: value,
+        }
+      end
+    end
+  end
+
+  def file_input
+    @file_input ||=
       begin
         path = File.expand_path(File.dirname(__FILE__))
         File.read(Pathname.new(path).join("password_list.txt")).chomp.lines.map(&:chomp)
@@ -29,15 +45,12 @@ class PartOne
 end
 
 class PartTwo < PartOne
-  def solution
-    @password_list.select do |password_item|
-      rules, password = password_item.split(': ')
-      limit_range, required_letter = rules.split(' ')
+  private
 
-      limit_range.split('-').map(&:to_i).count do |position|
-        password[position - 1] == required_letter
-      end == 1
-    end.count
+  def valid?(password)
+    [password[:range_begin], password[:range_end]].count do |position|
+      password[:value][position - 1] == password[:required_letter]
+    end == 1
   end
 end
 
