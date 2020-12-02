@@ -33,13 +33,10 @@ class PartTwo < PartOne
     @password_list.select do |password_item|
       rules, password = password_item.split(': ')
       limit_range, required_letter = rules.split(' ')
-      first_index, second_index = limit_range.split('-').map(&:to_i)
 
-      characters = password.split('')
-      first_index_matches = characters[first_index - 1] == required_letter
-      second_index_matches = characters[second_index - 1] == required_letter
-
-      (first_index_matches && !second_index_matches) || (!first_index_matches && second_index_matches)
+      limit_range.split('-').map(&:to_i).count do |position|
+        password[position - 1] == required_letter
+      end == 1
     end.count
   end
 end
