@@ -1,9 +1,7 @@
-require 'pry'
-require 'minitest/autorun'
-require 'pathname'
+require './base'
 
 class PartOne
-  def initialize(input = file_input)
+  def initialize(input = Base.file_input('2020/03/input.txt'))
     @input = input
   end
 
@@ -24,14 +22,6 @@ class PartOne
         input[row_count][lateral_position % input[row_count].length] == '#'
       end
     end
-  end
-
-  def file_input
-    @file_input ||=
-      begin
-        path = File.expand_path(File.dirname(__FILE__))
-        File.read(Pathname.new(path).join("input.txt")).chomp.lines.map(&:chomp)
-      end
   end
 end
 
@@ -55,7 +45,7 @@ class PartTwo < PartOne
   end
 end
 
-class TestToboggan < Minitest::Test
+class Test < Minitest::Test
   def test_part_one
     assert_equal 7, PartOne.new([
       '..##.......',
