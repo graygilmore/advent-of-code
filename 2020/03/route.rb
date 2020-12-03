@@ -18,12 +18,11 @@ class PartOne
   def count_trees(right:, down:)
     lateral_position = 0
 
-    (1..input.length-1).to_a.count do |row_count|
-      next if down == 2 && row_count % 2 != 0
-
+    (down..input.length-1).step(down).to_a.count do |row_count|
       if input[row_count]
         lateral_position += right
 
+        # We've gone beyond the board and need to loop back to the beginning
         if lateral_position >= input[row_count].length
           lateral_position = lateral_position - input[row_count].length
         end
