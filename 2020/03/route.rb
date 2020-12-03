@@ -8,26 +8,7 @@ class PartOne
   end
 
   def solution
-    lateral_position = 0
-
-    (1..input.length-1).to_a.count do |row_count|
-      if input[row_count]
-        lateral_position += 3
-
-        if lateral_position >= input[row_count].length
-          lateral_position = lateral_position - input[row_count].length
-        end
-
-        # Adding X's and O's so that I can debug this easier
-        if input[row_count][lateral_position] == '#'
-          input[row_count][lateral_position] = 'X'
-        else
-          input[row_count][lateral_position] = 'O'
-        end
-
-        input[row_count][lateral_position] == 'X'
-      end
-    end
+    count_trees(right: 3, down: 1)
   end
 
   private
@@ -35,6 +16,21 @@ class PartOne
   attr_reader :input
 
   def count_trees(right:, down:)
+    lateral_position = 0
+
+    (1..input.length-1).to_a.count do |row_count|
+      next if down == 2 && row_count % 2 != 0
+
+      if input[row_count]
+        lateral_position += right
+
+        if lateral_position >= input[row_count].length
+          lateral_position = lateral_position - input[row_count].length
+        end
+
+        input[row_count][lateral_position] == '#'
+      end
+    end
   end
 
   def file_input
@@ -49,21 +45,7 @@ end
 class PartTwo < PartOne
   def solution
     slopes.map do |slope|
-      lateral_position = 0
-
-      (1..input.length-1).to_a.count do |row_count|
-        next if slope[:down] == 2 && row_count % 2 != 0
-
-        if input[row_count]
-          lateral_position += slope[:right]
-
-          if lateral_position >= input[row_count].length
-            lateral_position = lateral_position - input[row_count].length
-          end
-
-          input[row_count][lateral_position] == '#'
-        end
-      end
+      count_trees(right: slope[:right], down: slope[:down])
     end.inject(:*)
   end
 
@@ -95,6 +77,7 @@ class TestToboggan < Minitest::Test
       '#...##....#',
       '.#..#...#.#',
     ]).solution
+    assert_equal 237, PartOne.new().solution
   end
 
   def test_part_two
@@ -111,8 +94,6 @@ class TestToboggan < Minitest::Test
       '#...##....#',
       '.#..#...#.#',
     ]).solution
+    assert_equal 2106818610, PartTwo.new().solution
   end
 end
-
-puts "Part One: #{::PartOne.new.solution}"
-puts "Part Two: #{::PartTwo.new.solution}"
