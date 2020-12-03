@@ -21,13 +21,7 @@ class PartOne
     (down..input.length-1).step(down).to_a.count do |row_count|
       if input[row_count]
         lateral_position += right
-
-        # We've gone beyond the board and need to loop back to the beginning
-        if lateral_position >= input[row_count].length
-          lateral_position = lateral_position - input[row_count].length
-        end
-
-        input[row_count][lateral_position] == '#'
+        input[row_count][lateral_position % input[row_count].length] == '#'
       end
     end
   end
