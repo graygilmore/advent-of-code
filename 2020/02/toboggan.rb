@@ -1,9 +1,7 @@
-require 'pry'
-require "minitest/autorun"
-require 'pathname'
+require './base'
 
 class PartOne
-  def initialize(input = file_input)
+  def initialize(input = Base.file_input('2020/02/password_list.txt'))
     @input = input
   end
 
@@ -33,14 +31,6 @@ class PartOne
         }
       end
     end
-  end
-
-  def file_input
-    @file_input ||=
-      begin
-        path = File.expand_path(File.dirname(__FILE__))
-        File.read(Pathname.new(path).join("password_list.txt")).chomp.lines.map(&:chomp)
-      end
   end
 end
 

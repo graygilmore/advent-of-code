@@ -1,27 +1,15 @@
-require 'pry'
-require "minitest/autorun"
-require 'pathname'
+require './base'
 
 class Calculator
-  def initialize(count = 2, expense_report = input)
+  def initialize(count = 2, expense_report = Base.file_input('2020/01/expense_report.txt'))
     @count = count
     @expense_report = expense_report
   end
 
   def solution
-    @expense_report.combination(@count) do |items|
+    @expense_report.map(&:to_i).combination(@count) do |items|
       return items.inject(:*) if items.sum == 2020
     end
-  end
-
-  private
-
-  def input
-    @input ||=
-      begin
-        path = File.expand_path(File.dirname(__FILE__))
-        File.read(Pathname.new(path).join("expense_report.txt")).chomp.lines.map(&:chomp).map(&:to_i)
-      end
   end
 end
 
