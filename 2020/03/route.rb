@@ -34,7 +34,7 @@ class PartOne
 
   attr_reader :input
 
-  def slope_map
+  def count_trees(right:, down:)
   end
 
   def file_input
@@ -48,30 +48,71 @@ end
 
 class PartTwo < PartOne
   def solution
+    slopes.map do |slope|
+      lateral_position = 0
+
+      (1..input.length-1).to_a.count do |row_count|
+        next if slope[:down] == 2 && row_count % 2 != 0
+
+        if input[row_count]
+          lateral_position += slope[:right]
+
+          if lateral_position >= input[row_count].length
+            lateral_position = lateral_position - input[row_count].length
+          end
+
+          input[row_count][lateral_position] == '#'
+        end
+      end
+    end.inject(:*)
+  end
+
+  private
+
+  def slopes
+    [
+      { right: 1, down: 1 },
+      { right: 3, down: 1 },
+      { right: 5, down: 1 },
+      { right: 7, down: 1 },
+      { right: 1, down: 2 },
+    ]
   end
 end
 
 class TestToboggan < Minitest::Test
-  # def test_part_one
-  #   assert_equal 7, PartOne.new([
-  #     '..##.......',
-  #     '#...#...#..',
-  #     '.#....#..#.',
-  #     '..#.#...#.#',
-  #     '.#...##..#.',
-  #     '..#.##.....',
-  #     '.#.#.#....#',
-  #     '.#........#',
-  #     '#.##...#...',
-  #     '#...##....#',
-  #     '.#..#...#.#',
-  #   ]).solution
-  # end
+  def test_part_one
+    assert_equal 7, PartOne.new([
+      '..##.......',
+      '#...#...#..',
+      '.#....#..#.',
+      '..#.#...#.#',
+      '.#...##..#.',
+      '..#.##.....',
+      '.#.#.#....#',
+      '.#........#',
+      '#.##...#...',
+      '#...##....#',
+      '.#..#...#.#',
+    ]).solution
+  end
 
-  # def test_part_two
-  #   assert_equal 1, PartTwo.new().solution
-  # end
+  def test_part_two
+    assert_equal 336, PartTwo.new([
+      '..##.......',
+      '#...#...#..',
+      '.#....#..#.',
+      '..#.#...#.#',
+      '.#...##..#.',
+      '..#.##.....',
+      '.#.#.#....#',
+      '.#........#',
+      '#.##...#...',
+      '#...##....#',
+      '.#..#...#.#',
+    ]).solution
+  end
 end
 
 puts "Part One: #{::PartOne.new.solution}"
-# puts "Part Two: #{::PartTwo.new.solution}"
+puts "Part Two: #{::PartTwo.new.solution}"
