@@ -55,15 +55,11 @@ class PassportValidator
   end
 
   def valid?
-    [
-      'byr',
-      'iyr',
-      'eyr',
-      'hgt',
-      'hcl',
-      'ecl',
-      'pid',
-    ].all? { |field_name| passport[field_name] }
+    required_fields.all? { |field_name| passport[field_name] }
+  end
+
+  def required_fields
+    %w(byr iyr eyr hgt hcl ecl pid)
   end
 
   private
