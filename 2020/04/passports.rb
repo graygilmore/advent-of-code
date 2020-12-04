@@ -79,11 +79,11 @@ class PartTwo < PartOne
           false
         end
       when 'hcl'
-        value.match?(/^#[0-9a-zA-Z]{6}/)
+        value.match?(/\A#[0-9a-zA-Z]{6}\z/)
       when 'ecl'
         %w(amb blu brn gry grn hzl oth).include?(value)
       when 'pid'
-        value.match?(/[0-9]{9}/) && value.length == 9
+        value.match?(/\A[0-9]{9}\z/)
       end
   end
 
