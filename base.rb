@@ -10,4 +10,9 @@ class Base
         File.read(Pathname.new(path).join(filename)).chomp.lines.map(&:chomp)
       end
   end
+
+  def self.raw_input(filename)
+    path = File.expand_path(File.dirname(__FILE__))
+    File.read(Pathname.new(path).join(filename))
+  end
 end
