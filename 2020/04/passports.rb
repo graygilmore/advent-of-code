@@ -70,11 +70,9 @@ class PartTwo < PartOne
         value.to_i >= 2020 && value.to_i <= 2030
       when 'hgt'
         if value.include?('cm')
-          centimeters = value.split('cm')[0].to_i
-          centimeters >= 150 && centimeters <= 193
+          value.to_i >= 150 && value.to_i <= 193
         elsif value.include?('in')
-          inches = value.split('in')[0].to_i
-          inches >= 59 && inches <= 76
+          value.to_i >= 59 && value.to_i <= 76
         else
           false
         end
