@@ -73,14 +73,10 @@ class StrictPassportValidator
   end
 
   def valid?
-    PassportValidator.new(passport).valid? &&
-      valid_byr? &&
-      valid_iyr? &&
-      valid_eyr? &&
-      valid_hgt? &&
-      valid_hcl? &&
-      valid_ecl? &&
-      valid_pid?
+    base_validator = PassportValidator.new(passport)
+
+    base_validator.valid? &&
+      base_validator.required_fields.all? { |field| send("valid_#{field}?") }
   end
 
   def valid_byr?
