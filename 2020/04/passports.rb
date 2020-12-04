@@ -6,7 +6,7 @@ class PartOne
   end
 
   def solution
-    passports.count { |passport| valid?(passport) }
+    passports.count { |passport| Passport.new(passport).valid? }
   end
 
   private
@@ -17,18 +17,6 @@ class PartOne
     @passports ||= begin
       input.split(/\n{2,}/)
     end
-  end
-
-  def valid?(passport)
-    [
-      'byr',
-      'iyr',
-      'eyr',
-      'hgt',
-      'hcl',
-      'ecl',
-      'pid',
-    ].all? { |field| passport.include?(field) }
   end
 end
 
@@ -90,7 +78,91 @@ class PartTwo < PartOne
   end
 end
 
+class Passport
+  def initialize(raw_data, strict: false)
+    @raw_data = raw_data
+    @strict = strict
+  end
+
+  def valid?
+    passport_validator_class.new(formatted_passport).valid?
+  end
+
+  private
+
+  attr_reader :raw_data, :strict
+
+  def passport_validator_class
+    strict ? StrictPassportValidator : PassportValidator
+  end
+
+  def formatted_passport
+    raw_data.split.map { |f| f.split(':') }.to_h
+  end
+end
+
+class PassportValidator
+  def initialize(passport)
+    @passport = passport
+  end
+
+  def valid?
+    [
+      'byr',
+      'iyr',
+      'eyr',
+      'hgt',
+      'hcl',
+      'ecl',
+      'pid',
+    ].all? { |field_name| passport[field_name] }
+  end
+
+  private
+
+  attr_reader :passport
+end
+
+class StrictPassportValidator
+  def initialize(passport)
+    @passport = passport
+  end
+
+  def valid?
+    false
+  end
+
+  private
+
+  attr_reader :passport
+end
+
 class Test < Minitest::Test
+  def test_passport
+    assert_equal false, Passport.new(
+      <<~INPUT
+        iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884
+        hcl:#cfa07d byr:1929
+      INPUT
+    ).valid?
+
+    assert_equal true, Passport.new(
+      <<~INPUT
+        ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
+        byr:1937 iyr:2017 cid:147 hgt:183cm
+      INPUT
+    ).valid?
+
+    assert_equal true, Passport.new(
+      <<~INPUT
+        hcl:#ae17e1 iyr:2013
+        eyr:2024
+        ecl:brn pid:760753108 byr:1931
+        hgt:179cm
+      INPUT
+    ).valid?
+  end
+
   def test_part_one
     assert_equal 2, PartOne.new(
       <<~INPUT
