@@ -22,59 +22,7 @@ end
 
 class PartTwo < PartOne
   def solution
-    formatted_passports.count { |passport| valid?(passport) }
-  end
-
-  private
-
-  attr_reader :formatted_passports
-
-  def valid?(passport)
-    [
-      'byr',
-      'iyr',
-      'eyr',
-      'hgt',
-      'hcl',
-      'ecl',
-      'pid',
-    ].all? do|field_name|
-      field = passport.find { |f| f.start_with?(field_name) }
-      field_valid?(field_name, field)
-    end
-  end
-
-  def field_valid?(field_name, field)
-    return false unless field
-
-    value = field.split("#{field_name}:")[1]
-
-    case field_name
-      when 'byr'
-        value.to_i >= 1920 && value.to_i <= 2002
-      when 'iyr'
-        value.to_i >= 2010 && value.to_i <= 2020
-      when 'eyr'
-        value.to_i >= 2020 && value.to_i <= 2030
-      when 'hgt'
-        if value.include?('cm')
-          value.to_i >= 150 && value.to_i <= 193
-        elsif value.include?('in')
-          value.to_i >= 59 && value.to_i <= 76
-        else
-          false
-        end
-      when 'hcl'
-        value.match?(/\A#[0-9a-zA-Z]{6}\z/)
-      when 'ecl'
-        %w(amb blu brn gry grn hzl oth).include?(value)
-      when 'pid'
-        value.match?(/\A[0-9]{9}\z/)
-      end
-  end
-
-  def formatted_passports
-    @formatted_passports ||= passports.map(&:split)
+    passports.count { |passport| Passport.new(passport, strict: true).valid? }
   end
 end
 
@@ -129,7 +77,48 @@ class StrictPassportValidator
   end
 
   def valid?
-    false
+    PassportValidator.new(passport).valid? &&
+      valid_byr? &&
+      valid_iyr? &&
+      valid_eyr? &&
+      valid_hgt? &&
+      valid_hcl? &&
+      valid_ecl? &&
+      valid_pid?
+  end
+
+  def valid_byr?
+    (1920..2002).include?(passport['byr'].to_i)
+  end
+
+  def valid_iyr?
+    (2010..2020).include?(passport['iyr'].to_i)
+  end
+
+  def valid_eyr?
+    (2020..2030).include?(passport['eyr'].to_i)
+  end
+
+  def valid_hgt?
+    if passport['hgt'].include?('cm')
+      (150..193).include?(passport['hgt'].to_i)
+    elsif passport['hgt'].include?('in')
+      (59..76).include?(passport['hgt'].to_i)
+    else
+      false
+    end
+  end
+
+  def valid_hcl?
+    passport['hcl'].match?(/\A#[0-9a-fA-F]{6}\z/)
+  end
+
+  def valid_ecl?
+    %w(amb blu brn gry grn hzl oth).include?(passport['ecl'])
+  end
+
+  def valid_pid?
+    passport['pid'].match?(/\A[0-9]{9}\z/)
   end
 
   private
@@ -161,6 +150,65 @@ class Test < Minitest::Test
         hgt:179cm
       INPUT
     ).valid?
+  end
+
+  def test_strict_passport
+    assert_equal false, Passport.new(
+      <<~INPUT,
+        eyr:1972 cid:100
+        hcl:#18171d ecl:amb hgt:170 pid:186cm iyr:2018 byr:1926
+      INPUT
+      strict: true
+    ).valid?
+
+    assert_equal true, Passport.new(
+      <<~INPUT,
+        pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980
+        hcl:#623a2f
+      INPUT
+      strict: true
+    ).valid?
+  end
+
+  def test_valid_byr
+    assert_equal true, StrictPassportValidator.new({ 'byr' => '2002' }).valid_byr?
+    assert_equal false, StrictPassportValidator.new({ 'byr' => '1919' }).valid_byr?
+    assert_equal false, StrictPassportValidator.new({ 'byr' => '2003' }).valid_byr?
+  end
+
+  def test_valid_iyr
+    assert_equal true, StrictPassportValidator.new({ 'iyr' => '2010' }).valid_iyr?
+    assert_equal false, StrictPassportValidator.new({ 'iyr' => '2009' }).valid_iyr?
+    assert_equal false, StrictPassportValidator.new({ 'iyr' => '2021' }).valid_iyr?
+  end
+
+  def test_valid_eyr
+    assert_equal true, StrictPassportValidator.new({ 'eyr' => '2020' }).valid_eyr?
+    assert_equal false, StrictPassportValidator.new({ 'eyr' => '2019' }).valid_eyr?
+    assert_equal false, StrictPassportValidator.new({ 'eyr' => '2031' }).valid_eyr?
+  end
+
+  def test_valid_hgt
+    assert_equal true, StrictPassportValidator.new({ 'hgt' => '60in' }).valid_hgt?
+    assert_equal true, StrictPassportValidator.new({ 'hgt' => '190cm' }).valid_hgt?
+    assert_equal false, StrictPassportValidator.new({ 'hgt' => '190in' }).valid_hgt?
+    assert_equal false, StrictPassportValidator.new({ 'hgt' => '190' }).valid_hgt?
+  end
+
+  def test_valid_hcl
+    assert_equal true, StrictPassportValidator.new({ 'hcl' => '#123abc' }).valid_hcl?
+    assert_equal false, StrictPassportValidator.new({ 'hcl' => '#123abz' }).valid_hcl?
+    assert_equal false, StrictPassportValidator.new({ 'hcl' => '123abc' }).valid_hcl?
+  end
+
+  def test_valid_ecl
+    assert_equal true, StrictPassportValidator.new({ 'ecl' => 'brn' }).valid_ecl?
+    assert_equal false, StrictPassportValidator.new({ 'ecl' => 'wat' }).valid_ecl?
+  end
+
+  def test_valid_pid
+    assert_equal true, StrictPassportValidator.new({ 'pid' => '000000001' }).valid_pid?
+    assert_equal false, StrictPassportValidator.new({ 'pid' => '0123456789' }).valid_pid?
   end
 
   def test_part_one
