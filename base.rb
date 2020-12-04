@@ -1,5 +1,6 @@
 require 'pry'
 require 'minitest/autorun'
+require "minitest/focus"
 require 'pathname'
 
 class Base
