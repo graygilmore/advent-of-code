@@ -17,8 +17,8 @@ class PartOne
       column = nil
 
       partition.chars.each do |char|
-        rows = row ? row : plane_rows
-        columns = column ? column : plane_columns
+        rows = row ? row : (0..127).to_a
+        columns = column ? column : (0..7).to_a
 
         case char
         when 'F'
@@ -34,14 +34,6 @@ class PartOne
 
       row.first * 8 + column.first
     end
-  end
-
-  def plane_rows
-    (0..127).to_a
-  end
-
-  def plane_columns
-    (0..7).to_a
   end
 
   attr_reader :input
