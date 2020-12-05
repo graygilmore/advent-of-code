@@ -17,11 +17,9 @@ end
 class PartTwo < PartOne
   def solution
     frequencies = { 0 => 1 }
-    duplicate_frequency = nil
-
     values = input.map(&:to_i)
 
-    while !duplicate_frequency do
+    loop do
       values.each do |value|
         new_frequency = frequencies.keys.last + value
 
