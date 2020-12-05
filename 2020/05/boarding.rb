@@ -13,18 +13,15 @@ class PartOne
 
   def seat_ids
     input.map do |partition|
-      row = nil
-      column = nil
+      row = (0..127).to_a
+      column = (0..7).to_a
 
       partition.chars.each do |char|
-        rows = row ? row : (0..127).to_a
-        columns = column ? column : (0..7).to_a
-
         case char
         when 'F', 'B'
-          row = rows.each_slice(rows.size/2).to_a[char == 'F' ? 0 : 1]
+          row = row.each_slice(row.size/2).to_a[char == 'F' ? 0 : 1]
         when 'R', 'L'
-          column = columns.each_slice(columns.size/2).to_a[char == 'R' ? 1 : 0]
+          column = column.each_slice(column.size/2).to_a[char == 'R' ? 1 : 0]
         end
       end
 
