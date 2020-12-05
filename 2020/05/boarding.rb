@@ -32,7 +32,7 @@ class PartOne
         end
       end
 
-      row.sum * 8 + column.sum
+      row.first * 8 + column.first
     end
   end
 
