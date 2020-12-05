@@ -16,19 +16,19 @@ end
 
 class PartTwo < PartOne
   def solution
-    frequencies = [0]
+    frequencies = { 0 => 1 }
     duplicate_frequency = nil
 
     values = input.map(&:to_i)
 
     while !duplicate_frequency do
       values.each do |value|
-        new_frequency = frequencies.last + value
+        new_frequency = frequencies.keys.last + value
 
-        if frequencies.include?(new_frequency)
+        if frequencies[new_frequency]
           return new_frequency
         else
-          frequencies << new_frequency
+          frequencies[new_frequency] = 1
         end
       end
     end
