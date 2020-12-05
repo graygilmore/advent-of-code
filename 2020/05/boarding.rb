@@ -48,6 +48,9 @@ class PartOne
 end
 
 class PartTwo < PartOne
+  def solution
+    ((seat_ids.min..seat_ids.max).to_a - seat_ids).first
+  end
 end
 
 class Test < Minitest::Test
@@ -60,5 +63,6 @@ class Test < Minitest::Test
   end
 
   def test_part_two
+    assert_equal 727, PartTwo.new().solution
   end
 end
