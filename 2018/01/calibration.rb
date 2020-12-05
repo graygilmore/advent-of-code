@@ -15,6 +15,24 @@ class PartOne
 end
 
 class PartTwo < PartOne
+  def solution
+    frequencies = [0]
+    duplicate_frequency = nil
+
+    values = input.map(&:to_i)
+
+    while !duplicate_frequency do
+      values.each do |value|
+        new_frequency = frequencies.last + value
+
+        if frequencies.include?(new_frequency)
+          return new_frequency
+        else
+          frequencies << new_frequency
+        end
+      end
+    end
+  end
 end
 
 class Test < Minitest::Test
@@ -27,5 +45,11 @@ class Test < Minitest::Test
   end
 
   def test_part_two
+    assert_equal 2, PartTwo.new(['+1', '-2', '+3', '+1']).solution
+    assert_equal 0, PartTwo.new(%w(+1, -1)).solution
+    assert_equal 10, PartTwo.new(%w(+3, +3, +4, -2, -4)).solution
+    assert_equal 5, PartTwo.new(%w(-6, +3, +8, +5, -6)).solution
+    assert_equal 14, PartTwo.new(%w(+7, +7, -2, -7, -4)).solution
+    assert_equal 533, PartTwo.new().solution
   end
 end
