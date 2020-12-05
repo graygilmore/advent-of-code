@@ -21,14 +21,10 @@ class PartOne
         columns = column ? column : (0..7).to_a
 
         case char
-        when 'F'
-          row = rows.each_slice(rows.size/2).to_a[0]
-        when 'B'
-          row = rows.each_slice(rows.size/2).to_a[1]
-        when 'R'
-          column = columns.each_slice(columns.size/2).to_a[1]
-        when 'L'
-          column = columns.each_slice(columns.size/2).to_a[0]
+        when 'F', 'B'
+          row = rows.each_slice(rows.size/2).to_a[char == 'F' ? 0 : 1]
+        when 'R', 'L'
+          column = columns.each_slice(columns.size/2).to_a[char == 'R' ? 1 : 0]
         end
       end
 
