@@ -12,11 +12,11 @@ class PartOne
   private
 
   def seat_ids
-    input.map do |partition|
+    input.map do |boarding_pass|
       row = (0..127).to_a
       column = (0..7).to_a
 
-      partition.chars.each do |char|
+      boarding_pass.chars.each do |char|
         case char
         when 'F', 'B'
           row = row.each_slice(row.size/2).to_a[char == 'F' ? 0 : 1]
