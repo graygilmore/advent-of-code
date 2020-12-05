@@ -1,4 +1,5 @@
 require './base'
+require 'set'
 
 class PartOne
   def initialize(input = Base.file_input('2018/01/input.txt'))
@@ -16,17 +17,17 @@ end
 
 class PartTwo < PartOne
   def solution
-    frequencies = { 0 => 1 }
+    frequencies = Set[0]
     values = input.map(&:to_i)
+    last_value = 0
 
     loop do
       values.each do |value|
-        new_frequency = frequencies.keys.last + value
+        new_frequency = last_value + value
+        last_value = new_frequency
 
-        if frequencies[new_frequency]
+        if !frequencies.add?(new_frequency)
           return new_frequency
-        else
-          frequencies[new_frequency] = 1
         end
       end
     end
