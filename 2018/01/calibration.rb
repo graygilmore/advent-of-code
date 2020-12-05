@@ -50,6 +50,6 @@ class Test < Minitest::Test
     assert_equal 10, PartTwo.new(%w(+3, +3, +4, -2, -4)).solution
     assert_equal 5, PartTwo.new(%w(-6, +3, +8, +5, -6)).solution
     assert_equal 14, PartTwo.new(%w(+7, +7, -2, -7, -4)).solution
-    assert_equal 533, PartTwo.new().solution
+    assert_equal 73272, PartTwo.new().solution
   end
 end
