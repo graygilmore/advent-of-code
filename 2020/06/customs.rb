@@ -23,6 +23,12 @@ class PartOne
 end
 
 class PartTwo < PartOne
+  def solution
+    groups.sum do |group|
+      counts = group.join('').chars.each_with_object(Hash.new(0)) { |word,counts| counts[word] += 1 }
+      counts.count { |_, v| v == group.size }
+    end
+  end
 end
 
 class Test < Minitest::Test
@@ -53,9 +59,29 @@ class Test < Minitest::Test
         b
       INPUT
     ).solution
-    assert_equal 0, PartOne.new.solution
+    assert_equal 6534, PartOne.new.solution
   end
 
   def test_part_two
+    assert_equal 6, PartTwo.new(
+      <<~INPUT
+        abc
+
+        a
+        b
+        c
+
+        ab
+        ac
+
+        a
+        a
+        a
+        a
+
+        b
+      INPUT
+    ).solution
+    assert_equal 3402, PartTwo.new.solution
   end
 end
