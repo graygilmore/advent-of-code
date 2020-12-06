@@ -6,11 +6,20 @@ class PartOne
   end
 
   def solution
+    fabric.values.count { |v| v.length > 1 }
+  end
+
+  private
+
+  attr_reader :input
+
+  def fabric
     fabric = {}
 
     input.each do |claim|
-      id, _, coordinates, size = claim.split(' ')
+      raw_id, _, coordinates, size = claim.split(' ')
 
+      id = raw_id.split('#')[1].to_i
       x_start, y_start = coordinates.gsub!(':', '').split(',').map(&:to_i)
       length, height = size.split('x').map(&:to_i)
 
@@ -22,15 +31,21 @@ class PartOne
       end
     end
 
-    fabric.values.count { |v| v.length > 1 }
+    fabric
   end
-
-  private
-
-  attr_reader :input
 end
 
 class PartTwo < PartOne
+  def solution
+    bad_claims = Set[]
+    fabric.each do |coordinate, ids|
+      bad_claims.merge(ids) if ids.size > 1
+    end
+
+    fabric.select do |coordinate, ids|
+      ids.size === 1 && !bad_claims.include?(ids.first)
+    end.values.first.first
+  end
 end
 
 class Test < Minitest::Test
@@ -44,5 +59,11 @@ class Test < Minitest::Test
   end
 
   def test_part_two
+    assert_equal 3, PartTwo.new([
+      '#1 @ 1,3: 4x4',
+      '#2 @ 3,1: 4x4',
+      '#3 @ 5,5: 2x2'
+    ]).solution
+    assert_equal 188, PartTwo.new().solution
   end
 end
