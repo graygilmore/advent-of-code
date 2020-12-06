@@ -6,9 +6,7 @@ class PartOne
   end
 
   def solution
-    groups.sum do |group|
-      group.join('').chars.uniq.size
-    end
+    groups.sum { |group| group.inject(:|).count }
   end
 
   private
@@ -17,17 +15,14 @@ class PartOne
 
   def groups
     @groups ||= begin
-      input.split(/\n{2,}/).map(&:split)
+      input.split(/\n{2,}/).map(&:split).map { |g| g.map(&:chars) }
     end
   end
 end
 
 class PartTwo < PartOne
   def solution
-    groups.sum do |group|
-      counts = group.join('').chars.each_with_object(Hash.new(0)) { |word,counts| counts[word] += 1 }
-      counts.count { |_, v| v == group.size }
-    end
+    groups.sum { |group| group.inject(:&).count }
   end
 end
 
