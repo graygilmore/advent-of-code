@@ -26,25 +26,20 @@ class PartOne
       input.split(/\n/).map do |rule|
         outer_bag, inner_bags = rule.split('bags contain').map(&:strip)
 
-        if inner_bags == 'no other bags.'
-          [
-            outer_bag,
-            {}
-          ]
-        else
+        inner_bags.tr!('.', '')
+        inner_bags.gsub!(/ bags?/, '')
 
-          [
-            outer_bag,
-            inner_bags.split(', ').map do |bag|
-              _, count, color = bag.split(/(\d) /)
+        [
+          outer_bag,
+          inner_bags == "no other" ? {} : inner_bags.split(', ').map do |bag|
+            count, color = bag.split(' ', 2)
 
-              [
-                color.gsub(/bags(.)?|bag(.)?/, '').strip,
-                count.to_i
-              ]
-            end.to_h
-          ]
-        end
+            [
+              color,
+              count.to_i
+            ]
+          end.to_h
+        ]
       end.to_h
     end
   end
