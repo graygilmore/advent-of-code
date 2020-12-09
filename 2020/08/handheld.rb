@@ -1,4 +1,5 @@
 require './base'
+require './computer'
 
 class PartOne
   def initialize(input = Base.raw_input('2020/08/input.txt'))
@@ -6,7 +7,21 @@ class PartOne
   end
 
   def solution
-    run_program(instructions)
+    Computer.new(input).run
+  end
+
+  private
+
+  attr_reader :input
+end
+
+class PartTwo < PartOne
+  def solution
+    (0..instructions.length-1).to_a.each do |index_change|
+      if instructions[index_change][0] != 'acc' && test_run(index_change) == "WE DID IT"
+        return @accumulator
+      end
+    end
   end
 
   def run_program(program)
@@ -42,6 +57,15 @@ class PartOne
     end
   end
 
+  def test_run(index_change)
+    new_program = instructions.dup
+
+    type = new_program[index_change][0]
+    new_program[index_change] = [type == 'nop' ? 'jmp' : 'nop', new_program[index_change][1]]
+
+    run_program(new_program)
+  end
+
   private
 
   attr_reader :input, :instructions
@@ -54,25 +78,6 @@ class PartOne
         [action, value.to_i]
       end
     end
-  end
-end
-
-class PartTwo < PartOne
-  def solution
-    (0..instructions.length-1).to_a.each do |index_change|
-      if instructions[index_change][0] != 'acc' && test_run(index_change) == "WE DID IT"
-        return @accumulator
-      end
-    end
-  end
-
-  def test_run(index_change)
-    new_program = instructions.dup
-
-    type = new_program[index_change][0]
-    new_program[index_change] = [type == 'nop' ? 'jmp' : 'nop', new_program[index_change][1]]
-
-    run_program(new_program)
   end
 end
 
