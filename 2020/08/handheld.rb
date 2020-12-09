@@ -94,7 +94,6 @@ class Test < Minitest::Test
     assert_equal 1675, PartOne.new.solution
   end
 
-  focus
   def test_part_two
     assert_equal 8, PartTwo.new(
       <<~INPUT
@@ -109,6 +108,6 @@ class Test < Minitest::Test
         acc +6
       INPUT
     ).solution
-    assert_equal 0, PartTwo.new.solution
+    assert_equal 1532, PartTwo.new.solution
   end
 end
