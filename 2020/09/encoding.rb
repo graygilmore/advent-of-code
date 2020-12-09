@@ -7,15 +7,7 @@ class PartOne
   end
 
   def solution
-    numbers.each.with_index do |number, index|
-      next if index < preamble
-
-      success = numbers.slice(index - preamble, index).combination(2).any? do |combo|
-        combo.sum == number
-      end
-
-      return number if !success
-    end
+    invalid_number
   end
 
   private
@@ -24,6 +16,20 @@ class PartOne
 
   def numbers
     @numbers ||= input.split(/\n/).map(&:to_i)
+  end
+
+  def invalid_number
+    @invalid_number ||= begin
+      failed_index = (0..numbers.length-1).select do |index|
+        next if index < preamble
+
+        numbers.slice(index - preamble, index).combination(2).none? do |combo|
+          combo.sum == numbers[index]
+        end
+      end
+
+      numbers[failed_index[0]]
+    end
   end
 end
 
