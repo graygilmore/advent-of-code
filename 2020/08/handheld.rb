@@ -17,67 +17,7 @@ end
 
 class PartTwo < PartOne
   def solution
-    (0..instructions.length-1).to_a.each do |index_change|
-      if instructions[index_change][0] != 'acc' && test_run(index_change) == "WE DID IT"
-        return @accumulator
-      end
-    end
-  end
-
-  def run_program(program)
-    @instructions_ran = Set[]
-    @index = 0
-    @accumulator = 0
-
-    run_instruction(program.first, program)
-  end
-
-  def run_instruction(instruction, program)
-    name, value = instruction
-
-    if @index == program.length
-      return 'WE DID IT'
-    end
-
-    if @instructions_ran.add?(@index)
-      case name
-      when 'nop'
-        @index += 1
-        run_instruction(program[@index], program)
-      when 'acc'
-        @index += 1
-        @accumulator += value
-        run_instruction(program[@index], program)
-      when 'jmp'
-        @index += value
-        run_instruction(program[@index], program)
-      end
-    else
-      return @accumulator
-    end
-  end
-
-  def test_run(index_change)
-    new_program = instructions.dup
-
-    type = new_program[index_change][0]
-    new_program[index_change] = [type == 'nop' ? 'jmp' : 'nop', new_program[index_change][1]]
-
-    run_program(new_program)
-  end
-
-  private
-
-  attr_reader :input, :instructions
-
-  def instructions
-    @instructions ||= begin
-      input.split(/\n/).map do |line|
-        action, value = line.split(' ')
-
-        [action, value.to_i]
-      end
-    end
+    Computer.new(input).run_fixed_program
   end
 end
 
