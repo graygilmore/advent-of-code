@@ -90,34 +90,44 @@ end
 
 class Test < Minitest::Test
   def test_run
-    assert_equal 5, Computer.new(
-      <<~INPUT
-        nop +0
-        acc +1
-        jmp +4
-        acc +3
-        jmp -3
-        acc -99
-        acc +1
-        jmp -4
-        acc +6
-      INPUT
-    ).run
+    assert_equal 5, Computer.new(test_input).run
   end
 
   def test_run_fixed_program
-    assert_equal 8, Computer.new(
-      <<~INPUT
-        nop +0
-        acc +1
-        jmp +4
-        acc +3
-        jmp -3
-        acc -99
-        acc +1
-        jmp -4
-        acc +6
-      INPUT
-    ).run_fixed_program
+    assert_equal 8, Computer.new(test_input).run_fixed_program
+  end
+
+  def test_halted_program
+    assert_equal [false, 5], Program.new(test_input).run
+  end
+
+  def test_fixed_program
+    assert_equal [true, 8], Program.new([
+      ['nop', 0],
+      ['acc', 1],
+      ['jmp', 4],
+      ['acc', 3],
+      ['jmp', -3],
+      ['acc', -99],
+      ['acc', 1],
+      ['nop', -4],
+      ['acc', 6]
+    ]).run
+  end
+
+  private
+
+  def test_input
+    [
+      ['nop', 0],
+      ['acc', 1],
+      ['jmp', 4],
+      ['acc', 3],
+      ['jmp', -3],
+      ['acc', -99],
+      ['acc', 1],
+      ['jmp', -4],
+      ['acc', 6]
+    ]
   end
 end
