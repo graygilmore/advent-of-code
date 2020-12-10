@@ -45,6 +45,8 @@ class Test < Minitest::Test
   end
 
   def test_part_two
+    assert_equal 8, PartTwo.new(input).solution
+    assert_equal 19208, PartTwo.new(larger_input).solution
   end
 
   def input
