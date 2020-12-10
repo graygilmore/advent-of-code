@@ -6,13 +6,18 @@ class PartOne
   end
 
   def solution
-    @one_difference = 0
-    @three_difference = 0
-    @matches = Set[]
+    one_difference = 0
+    three_difference = 0
 
-    find_adapter(0)
+    adapters.each_cons(2) do |a,b|
+      if b - a == 3
+        three_difference += 1
+      elsif b - a == 1
+        one_difference += 1
+      end
+    end
 
-    @one_difference * @three_difference
+    one_difference * three_difference
   end
 
   private
@@ -22,27 +27,8 @@ class PartOne
   def adapters
     @adapters ||= begin
       all_adapters = input.split.map(&:to_i).sort
-      all_adapters.append(all_adapters.max + 3)
+      all_adapters.prepend(0).append(all_adapters.last + 3)
     end
-  end
-
-  def find_adapter(adapter_to_match)
-    match = adapters.detect do |adapter|
-      adapter - adapter_to_match == 1 || adapter - adapter_to_match == 3
-    end
-
-    @matches.add(match)
-
-    if match == adapters.max
-      @three_difference += 1
-      return
-    end
-
-    diff = match - adapter_to_match
-
-    diff == 3 ? @three_difference += 1 : @one_difference += 1
-
-    find_adapter(match)
   end
 end
 
