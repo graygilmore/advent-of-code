@@ -13,7 +13,7 @@ class PartOne
 
   attr_reader :input
 
-  def fill_seats(seating_arrangement)
+  def fill_seats(seating_arrangement, move_requirement = 4)
     new_seats = seating_arrangement.dup
 
     seating_arrangement.each do |seat|
@@ -22,7 +22,7 @@ class PartOne
       coordinate = seat[0]
       occupied = occupied_adjacent_seats(coordinate, seating_arrangement)
 
-      if occupied >= 4 && seating_arrangement[coordinate] == '#'
+      if occupied >= move_requirement && seating_arrangement[coordinate] == '#'
         new_seats[coordinate] = 'L'
       elsif occupied == 0 && seating_arrangement[coordinate] == 'L'
         new_seats[coordinate] = '#'
@@ -32,7 +32,7 @@ class PartOne
     if new_seats == seating_arrangement
       return filled_seats(new_seats)
     else
-      fill_seats(new_seats)
+      fill_seats(new_seats, move_requirement)
     end
   end
 
@@ -47,6 +47,14 @@ class PartOne
         end
       end.flatten(1).to_h
     end
+  end
+
+  def y_max
+    @y_max ||= input.split.count
+  end
+
+  def x_max
+    @x_max ||= input.split.first.chars.count
   end
 
   def adjacent_seats(seat)
@@ -75,6 +83,41 @@ end
 
 class PartTwo < PartOne
   def solution
+    fill_seats(initial_seats, 5)
+  end
+
+  def adjacent_seats(seat, seating_arrangement)
+    x,y = seat
+
+    up = (1..y).map { |up| [x, y-up] }
+    down = (y+1..y_max-1).map { |down| [x, down] }
+
+    left = (0..x-1).map { |left| [left, y] }
+    right = (x+1..x_max).map { |right| [right, y] }
+
+    up_right = (1..x_max).collect { |i| [x+i, y-i] }
+    down_right = (1..x_max).collect { |i| [x+i, y+i] }
+
+    up_left = (1..x_max).collect { |i| [x-i, y-i] }
+    down_left = (1..x_max).collect { |i| [x-i, y+i] }
+
+    [
+      up_left,
+      up,
+      up_right,
+      right,
+      down_right,
+      down,
+      down_left,
+      left.reverse,
+    ]
+  end
+
+  def occupied_adjacent_seats(seat, seating_arrangement)
+    adjacent_seats(seat, seating_arrangement).count do |direction|
+      first_seat = direction.detect { |coordinate| seating_arrangement[coordinate] != '.' }
+      seating_arrangement[first_seat] == '#'
+    end
   end
 end
 
@@ -85,6 +128,8 @@ class Test < Minitest::Test
   end
 
   def test_part_two
+    assert_equal 26, PartTwo.new(input).solution
+    assert_equal 2057, PartTwo.new.solution
   end
 
   def input
