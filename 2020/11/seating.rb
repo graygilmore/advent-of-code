@@ -81,7 +81,7 @@ end
 class Test < Minitest::Test
   def test_part_one
     assert_equal 37, PartOne.new(input).solution
-    assert_equal 0, PartOne.new.solution
+    assert_equal 2303, PartOne.new.solution
   end
 
   def test_part_two
