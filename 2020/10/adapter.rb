@@ -34,6 +34,22 @@ end
 
 class PartTwo < PartOne
   def solution
+    possible_combinations(0)
+  end
+
+  def possible_combinations(current)
+    return 1 if current == adapters.last
+
+    @next_adapters ||= {}
+    @next_adapters[current] ||= begin
+      next_adapters(current).map { |i| possible_combinations(i) }.sum
+    end
+  end
+
+  def next_adapters(current)
+    adapters.select do |i|
+      (1..3).include?(i - current)
+    end
   end
 end
 
@@ -47,6 +63,7 @@ class Test < Minitest::Test
   def test_part_two
     assert_equal 8, PartTwo.new(input).solution
     assert_equal 19208, PartTwo.new(larger_input).solution
+    assert_equal 3543369523456, PartTwo.new.solution
   end
 
   def input
