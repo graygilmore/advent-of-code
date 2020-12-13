@@ -3,6 +3,9 @@ require './base'
 class PartOne
   def initialize(input = Base.raw_input('2020/12/input.txt'))
     @input = input
+  end
+
+  def solution
     @current_position = {
       N: 0,
       E: 0,
@@ -16,9 +19,7 @@ class PartOne
       S: 180,
       W: 270
     }
-  end
 
-  def solution
     instructions.each do |instruction|
       action, value = instruction
 
@@ -53,6 +54,47 @@ end
 
 class PartTwo < PartOne
   def solution
+    @current_position = {
+      N: 0,
+      E: 0,
+      S: 0,
+      W: 0,
+    }
+    @directions = {
+      N: 0,
+      E: 90,
+      S: 180,
+      W: 270
+    }
+    @waypoint = {
+      N: 1,
+      E: 10,
+      S: 0,
+      W: 0,
+    }
+
+    instructions.each do |instruction|
+      action, value = instruction
+
+      case action
+      when :N, :E, :S, :W
+        @waypoint[action] += value
+      when :L, :R
+        rotation = (value % 360) / 90 * (action == :R ? -1 : 1)
+
+        next if rotation.zero?
+
+        rotated_values = @waypoint.values.rotate(rotation)
+        @waypoint.transform_values!.with_index { |_, i| rotated_values[i] }
+      when :F
+        current_position.each do |direction, _|
+          @current_position[direction] += @waypoint[direction] * value
+        end
+      end
+    end
+
+    (current_position[:E] - current_position[:W]).abs +
+      (current_position[:N] - current_position[:S]).abs
   end
 end
 
@@ -63,6 +105,8 @@ class Test < Minitest::Test
   end
 
   def test_part_two
+    assert_equal 286, PartTwo.new(input).solution
+    assert_equal 178986, PartTwo.new.solution
   end
 
   def input
