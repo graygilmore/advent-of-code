@@ -1,44 +1,43 @@
 require './base'
 
 class PartOne
-  def initialize(input)
+  def initialize(input, target = 2020)
     @input = input
+    @target = target
   end
 
   def solution
     @spoken_numbers = starting_numbers.map.with_index { |v,i| [v.to_i, [i+1]] }.to_h
-    speak_number(0, starting_numbers.count+1)
+    @last_spoken = 0
+
+    (starting_numbers.count+1..target-1).each do |turn|
+      if @spoken_numbers[@last_spoken].nil?
+        @spoken_numbers[@last_spoken] = [turn]
+        @last_spoken = 0
+      elsif @spoken_numbers[@last_spoken].count == 1
+        @spoken_numbers[@last_spoken] << turn
+        @spoken_numbers[@last_spoken].inject(:-).abs
+        @last_spoken = @spoken_numbers[@last_spoken].inject(:-).abs
+      else
+        turns = @spoken_numbers[@last_spoken].insert(2, turn)[1..2]
+        @spoken_numbers[@last_spoken] = turns
+        @last_spoken = @spoken_numbers[@last_spoken].inject(:-).abs
+      end
+    end
+
+    @last_spoken
   end
 
   private
 
-  attr_reader :input
+  attr_reader :input, :target
 
   def starting_numbers
     @starting_numbers ||= input.split(',')
   end
-
-  def speak_number(number, turn)
-    return number if turn == 2020
-
-    if @spoken_numbers[number].nil?
-      @spoken_numbers[number] = [turn]
-      speak_number(0, turn + 1)
-    elsif @spoken_numbers[number].count == 1
-      @spoken_numbers[number] << turn
-      speak_number(@spoken_numbers[number].inject(:-).abs, turn + 1)
-    else
-      turns = @spoken_numbers[number].insert(2, turn)[1..2]
-      @spoken_numbers[number] = turns
-      speak_number(@spoken_numbers[number].inject(:-).abs, turn + 1)
-    end
-  end
 end
 
 class PartTwo < PartOne
-  def solution
-    0
-  end
 end
 
 class Test < Minitest::Test
@@ -54,13 +53,7 @@ class Test < Minitest::Test
   end
 
   def test_part_two
-    assert_equal 0, PartTwo.new(input).solution
-    assert_equal 0, PartTwo.new('16,1,0,18,12,14,19').solution
-  end
-
-  def input
-    <<~INPUT
-
-    INPUT
+    assert_equal 175594, PartTwo.new('0,3,6', 30000000).solution
+    assert_equal 16671510, PartTwo.new('16,1,0,18,12,14,19', 30000000).solution
   end
 end
