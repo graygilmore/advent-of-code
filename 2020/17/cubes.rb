@@ -60,8 +60,25 @@ class PartOne
 end
 
 class PartTwo < PartOne
-  def solution
-    0
+  private
+
+  def initial_grid
+    @initial_grid ||= begin
+      initial_state = input.split(/\n/).join()
+      length = input.split(/\n/).count
+
+      (0..(length*length)-1).map { |i| [[i%length, i/length, 0, 0], initial_state[i]] }.to_h
+    end
+  end
+
+  def neighbors(location)
+    @neighbors ||= {}
+
+    @neighbors[location] ||= begin
+      ([-1, 0, 1].repeated_permutation(4).to_a - [[0,0,0,0]]).map do |xm, ym, zm, wm|
+        [location[0] + xm, location[1] + ym, location[2] + zm, location[3] + wm]
+      end
+    end
   end
 end
 
@@ -72,8 +89,8 @@ class Test < Minitest::Test
   end
 
   def test_part_two
-    assert_equal 0, PartTwo.new(input).solution
-    assert_equal 0, PartTwo.new.solution
+    assert_equal 848, PartTwo.new(input).solution
+    assert_equal 1896, PartTwo.new.solution
   end
 
   def input
