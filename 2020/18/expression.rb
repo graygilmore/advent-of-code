@@ -45,7 +45,39 @@ end
 
 class PartTwo < PartOne
   def solution
-    0
+    expressions.sum { |expression| solve(expression) }
+  end
+
+  private
+
+  def solve(expression)
+    no_parens = solve_parens(expression.join)
+    addition_only(no_parens)
+    no_parens.gsub!(/\d+\+\d+/) { |n| calculate(n.split(/(\+)/)) }
+    calculate(no_parens.split(/(\*)/))
+  end
+
+  def solve_parens(expression)
+    expression.gsub!(/\(\d[\*|\+|\d]+\d\)/) do |n|
+      addition_only(n)
+      calculate(n.tr('(', '').tr(')', '').split(/(\*)/))
+    end
+
+    if expression.include?('(')
+      solve_parens(expression)
+    end
+
+    expression
+  end
+
+  def addition_only(expression)
+    expression.gsub!(/\d+\+\d+/) { |n| calculate(n.split(/(\+)/)) }
+
+    if expression.include?('+')
+      addition_only(expression)
+    end
+
+    expression
   end
 end
 
@@ -61,12 +93,12 @@ class Test < Minitest::Test
   end
 
   def test_part_two
-    assert_equal 0, PartTwo.new(input).solution
+    # assert_equal 231, PartTwo.new('1 + 2 * 3 + 4 * 5 + 6').solution
+    # assert_equal 51, PartTwo.new('1 + (2 * 3) + (4 * (5 + 6))').solution
+    # assert_equal 46, PartTwo.new('2 * 3 + (4 * 5)').solution
+    assert_equal 1445, PartTwo.new('5 + (8 * 3 + 9 + 3 * 4 * 3)').solution
+    assert_equal 669060, PartTwo.new('5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))').solution
+    assert_equal 23340, PartTwo.new('((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2').solution
     assert_equal 0, PartTwo.new.solution
-  end
-
-  def input
-    <<~INPUT
-    INPUT
   end
 end
