@@ -51,13 +51,13 @@ end
 
 class Test < Minitest::Test
   def test_part_one
-    # assert_equal 71, PartOne.new('1 + 2 * 3 + 4 * 5 + 6').solution
+    assert_equal 71, PartOne.new('1 + 2 * 3 + 4 * 5 + 6').solution
     assert_equal 51, PartOne.new('1 + (2 * 3) + (4 * (5 + 6))').solution
     assert_equal 26, PartOne.new('2 * 3 + (4 * 5)').solution
     assert_equal 437, PartOne.new('5 + (8 * 3 + 9 + 3 * 4 * 3)').solution
     assert_equal 12240, PartOne.new('5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))').solution
     assert_equal 13632, PartOne.new('((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2').solution
-    assert_equal 0, PartOne.new.solution
+    assert_equal 16332191652452, PartOne.new.solution
   end
 
   def test_part_two
