@@ -6,32 +6,33 @@ class PartOne
   end
 
   def solution
-    messages.count { |message| valid_messages.include?(message) }
+    binding.pry
+    regex = build_regex(find_rule(0).flatten(1))
+    messages.count { |message| message.match?(/\A#{regex}\z/) }
   end
 
   private
 
   attr_reader :input
 
-  def valid_messages
-    flatten_rule(rules[0].first.map { |n| rules[n] })
-  end
-
-  def flatten_rule(rule)
-    rulez = rule.map do |f_rule|
-      if f_rule.is_a?(String)
-        f_rule
-      elsif f_rule.is_a?(Integer)
-        rules[f_rule]
-      else
-        f_rule.map { |o| flatten_rule(o) }
+  def build_regex(regex)
+    # binding.pry
+    if regex.include?('|')
+      regex.gsub(/(\d+|\s+)/) { |d| "(#{build_regex(d)})" }
+    elsif ['a', 'b'].include?(regex)
+      regex
+    else
+      regex.split(' ').map do |r|
+        build_regex(rules[r])
       end
     end
+  end
 
-    if rulez.flatten.any? { |i| i.is_a?(Integer) }
-      flatten_rule(rulez)
+  def find_rule(rule)
+    if rule.is_a?(Array)
+      rule.map { |n| find_rule(n) }
     else
-      rulez
+      rules[rule].is_a?(Array) ? rules[rule].map { |n| find_rule(n) } : rules[rule]
     end
   end
 
@@ -41,12 +42,8 @@ class PartOne
         number, matches = rule.split(/^(\d+)\: /).reject(&:empty?)
 
         [
-          number.to_i,
-          if ['"a"', '"b"'].include?(matches.to_s)
-            matches.tr!('"', '')
-          else
-            matches.split(' | ').map { |n| n.split.map(&:to_i) }
-          end
+          number,
+          matches.tr('"', '').gsub(/ \| /, '|')
         ]
       end.to_h
     end
