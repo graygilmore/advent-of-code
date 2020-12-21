@@ -6,8 +6,8 @@ class PartOne
   end
 
   def solution
-    binding.pry
-    regex = build_regex(find_rule(0).flatten(1))
+    # binding.pry
+    regex = build_regex(rules["0"]).tr(' ', '')
     messages.count { |message| message.match?(/\A#{regex}\z/) }
   end
 
@@ -16,24 +16,10 @@ class PartOne
   attr_reader :input
 
   def build_regex(regex)
-    # binding.pry
-    if regex.include?('|')
-      regex.gsub(/(\d+|\s+)/) { |d| "(#{build_regex(d)})" }
-    elsif ['a', 'b'].include?(regex)
-      regex
-    else
-      regex.split(' ').map do |r|
-        build_regex(rules[r])
-      end
-    end
-  end
-
-  def find_rule(rule)
-    if rule.is_a?(Array)
-      rule.map { |n| find_rule(n) }
-    else
-      rules[rule].is_a?(Array) ? rules[rule].map { |n| find_rule(n) } : rules[rule]
-    end
+    return regex if !regex.match?(/\d+/)
+    regex.
+      gsub(/(\d+\s\d+\|\d+\s\d+)/, '(\1)').
+      gsub(/\d+/) { |d| build_regex(rules[d]) }
   end
 
   def rules
