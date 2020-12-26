@@ -83,7 +83,7 @@ class Test < Minitest::Test
 
   def test_part_two
     assert_equal 'mxmxvkd,sqjhc,fvjkl', PartTwo.new(input).solution
-    assert_equal 0, PartTwo.new.solution
+    assert_equal 'prxmdlz,ncjv,knprxg,lxjtns,vzzz,clg,cxfz,qdfpq', PartTwo.new.solution
   end
 
   def input
