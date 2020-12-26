@@ -65,7 +65,13 @@ end
 
 class PartTwo < PartOne
   def solution
-    0
+    @known = []
+
+    while allergens.any? { |_, v| v[:possibilities].count > 1 } do
+      filter(allergens)
+    end
+
+    allergens.sort.map { |a,b| b[:possibilities].keys.first }.join(',')
   end
 end
 
@@ -76,7 +82,7 @@ class Test < Minitest::Test
   end
 
   def test_part_two
-    assert_equal 0, PartTwo.new(input).solution
+    assert_equal 'mxmxvkd,sqjhc,fvjkl', PartTwo.new(input).solution
     assert_equal 0, PartTwo.new.solution
   end
 
