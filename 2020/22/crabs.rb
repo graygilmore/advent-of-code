@@ -6,13 +6,17 @@ class PartOne
   end
 
   def solution
-    winning_hand = play_cards(hands).reverse
-    winning_hand.sum { |n| n * (winning_hand.index(n) + 1) }
+    winning_hand(play_cards(hands))
   end
 
   private
 
   attr_reader :input
+
+  def winning_hand(hand)
+    winner = hand.reverse
+    winner.sum { |n| n * (winner.index(n) + 1) }
+  end
 
   def play_cards(hands)
     p1, p2 = hands
@@ -47,7 +51,41 @@ end
 
 class PartTwo < PartOne
   def solution
-    0
+    winning_hand(play_game(hands)[1])
+  end
+
+  private
+
+  def play_game(hands)
+    play_cards(hands, Set[])
+  end
+
+  def play_cards(hands, rounds)
+    p1, p2 = hands
+    while [p1, p2].none?(&:empty?) do
+      return [:p1, p1] unless rounds.add?(hands.to_s)
+
+      p1_card = p1.shift
+      p2_card = p2.shift
+
+      if p1.count >= p1_card && p2.count >= p2_card
+        sub_game = play_game([p1[0..p1_card-1], p2[0..p2_card-1]])
+
+        if sub_game[0] == :p1
+          p1 << p1_card << p2_card
+        else
+          p2 << p2_card << p1_card
+        end
+      else
+        if p1_card > p2_card
+          p1 << p1_card << p2_card
+        else
+          p2 << p2_card << p1_card
+        end
+      end
+    end
+
+    p1.empty? ? [:p2, p2] : [:p1, p1]
   end
 end
 
@@ -58,8 +96,8 @@ class Test < Minitest::Test
   end
 
   def test_part_two
-    assert_equal 0, PartTwo.new(input).solution
-    assert_equal 0, PartTwo.new.solution
+    assert_equal 291, PartTwo.new(input).solution
+    assert_equal 36246, PartTwo.new.solution
   end
 
   def input
