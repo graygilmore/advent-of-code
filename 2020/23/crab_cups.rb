@@ -70,7 +70,32 @@ end
 
 class PartTwo < PartOne
   def solution
-    0
+    setup_cups
+    play_cups
+
+    value1 = @cups[1]
+    value2 = @cups[value1]
+
+    value1 * value2
+  end
+
+  private
+
+  def setup_cups
+    @cups = {}
+    input_cups = input.chars.map(&:to_i)
+    @current = input_cups.first
+
+    input_cups << (input_cups.max+1..1000000).to_a
+
+    input_cups.flatten!
+
+    @min = input_cups.min
+    @max = input_cups.max
+
+    input_cups.each_with_index { |v, i|
+      @cups[v] = input_cups[i+1] ? input_cups[i+1] : input_cups.first
+    }
   end
 end
 
@@ -82,8 +107,8 @@ class Test < Minitest::Test
   end
 
   def test_part_two
-    assert_equal 0, PartTwo.new(input).solution
-    assert_equal 0, PartTwo.new('327465189').solution
+    assert_equal 149245887792, PartTwo.new(input, 10000000).solution
+    assert_equal 474600314018, PartTwo.new('327465189', 10000000).solution
   end
 
   def input
