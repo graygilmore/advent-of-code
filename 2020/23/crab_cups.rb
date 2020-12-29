@@ -7,32 +7,63 @@ class PartOne
   end
 
   def solution
-    cups = play_cups(input.chars.map(&:to_i))    
-    cups.rotate!(cups.find_index(1))
-    cups.shift
-    cups.join
+    setup_cups
+    play_cups
+
+    value = @cups[1]
+    answer = [value]
+    loop {
+      value = @cups[value]
+      break if value == 1
+      answer << value
+    }
+
+    answer.join
   end
 
   private
 
   attr_reader :input, :moves
 
-  def play_cups(cups)
-    moves.times do
-      current = cups[0]
-      held_cups = cups.slice!(1, 3)
-      cups.insert(find_destination_index(cups, current - 1), held_cups).flatten!
-      cups.rotate!
-    end
-    cups
+  def setup_cups
+    @cups = {}
+    input_cups = input.chars.map(&:to_i)
+    @current = input_cups.first
+    @min = input_cups.min
+    @max = input_cups.max
+    input_cups.each_with_index { |v, i|
+      @cups[v] = input_cups[i+1] ? input_cups[i+1] : input_cups.first
+    }
   end
 
-  def find_destination_index(cups, target)
-    if cups.index(target)
-      cups.index(target) + 1
-    else
-      new_target = target - 1 > 0 ? target - 1 : cups.max
-      find_destination_index(cups, new_target)
+  def play_cups
+    moves.times do
+      # find next three cups
+      next1 = @cups[@current]
+      next2 = @cups[next1]
+      next3 = @cups[next2]
+
+      # update current pointer to fourth cup
+      @cups[@current] = @cups[next3]
+
+      # find destination
+      destination = @current
+      loop do
+        destination = destination - 1
+        if destination < @min
+          destination = @max
+        end
+
+        break unless [next1, next2, next3].include?(destination)
+      end
+
+      # place cups (update destination pointer and last held cup pointer)
+      old_pointer = @cups[destination]
+      @cups[destination] = next1
+      @cups[next3] = old_pointer
+
+      # select new current cup
+      @current = @cups[@current]
     end
   end
 end
