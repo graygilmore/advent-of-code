@@ -9,14 +9,15 @@ class PartOne
     horizontal = 0
     depth = 0
 
-    directions.each do |movement, value|
-      case movement
+    instructions.each do |direction, value|
+      movement = value.to_i
+      case direction
       when "forward"
-        horizontal += value.to_i
+        horizontal += movement
       when "up"
-        depth -= value.to_i
+        depth -= movement
       when "down"
-        depth += value.to_i
+        depth += movement
       end
     end
 
@@ -27,8 +28,8 @@ class PartOne
 
   attr_reader :input
 
-  def directions
-    @directions ||= input.chomp.lines.map(&:split)
+  def instructions
+    @instructions ||= input.chomp.lines.map(&:split)
   end
 end
 
@@ -38,16 +39,16 @@ class PartTwo < PartOne
     depth = 0
     aim = 0
 
-    directions.each do |movement, value|
-      move_value = value.to_i
-      case movement
+    instructions.each do |direction, value|
+      movement = value.to_i
+      case direction
       when "forward"
-        horizontal += move_value
-        depth += move_value * aim
+        horizontal += movement
+        depth += movement * aim
       when "up"
-        aim -= move_value
+        aim -= movement
       when "down"
-        aim += move_value
+        aim += movement
       end
     end
 
