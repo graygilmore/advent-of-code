@@ -42,12 +42,9 @@ class PartTwo < PartOne
 
     filtered = bins.select do |b|
       tallied = bins.map { _1[index] }.tally
+      most_common = tallied['0'] == tallied['1'] ? '1' : tallied.max_by { _2 }[0]
 
-      if tallied['0'] > tallied['1']
-        max ? b[index] == '0' : b[index] == '1'
-      else
-        max ? b[index] == '1' : b[index] == '0'
-      end
+      max ? b[index] == most_common : b[index] != most_common
     end
 
     filter_binaries(filtered, index + 1, max)
