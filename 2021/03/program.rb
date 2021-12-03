@@ -6,23 +6,16 @@ class PartOne
   end
 
   def solution
-    gamma = ''
-    epsilon = ''
+    rates = (0..binaries.first.length - 1).reduce({ gamma: '', epsilon: ''}) do |r, i|
+      most_common = binaries.map { _1[i] }.tally.max_by { _2 }[0]
 
-    b_length = binaries.first.length - 1
+      r[:gamma] += most_common == '1' ? '1' : '0'
+      r[:epsilon] += most_common == '1' ? '0' : '1'
 
-    (0..b_length).each do |i|
-      b = binaries.map { _1[i] }.tally
-      if b['0'] > b['1']
-        gamma += '0'
-        epsilon += '1'
-      else
-        gamma += '1'
-        epsilon += '0'
-      end
+      r
     end
 
-    gamma.to_i(2) * epsilon.to_i(2)
+    rates[:gamma].to_i(2) * rates[:epsilon].to_i(2)
   end
 
   private
