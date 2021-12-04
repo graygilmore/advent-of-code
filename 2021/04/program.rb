@@ -3,14 +3,32 @@ require './base'
 class PartOne
   def initialize(input = Base.raw_input('2021/04/input.txt'))
     @input = input
-    @board_length = 0
+    @computed_boards = {}
   end
 
   def solution
-    numbers.each do |n|
-      flip_numbers(n)
-      if foo = any_boards?(n)
-        return foo
+    play
+    @computed_boards[@computed_boards.keys.first]
+  end
+
+  def play
+    numbers.each.with_index do |n, i|
+      next if i < boards.first.first.size - 1
+
+      winning_boards = boards.select do |board|
+        board.any? { |t| (numbers[0..i] & t).size == t.size }
+      end
+
+      winning_boards.each do |board|
+        board_index = boards.find_index(board)
+
+        unless @computed_boards.key?(board_index)
+          @computed_boards[board_index] =
+            (board.flatten.uniq - numbers[0..i]).sum * n
+        end
+      end
+
+      if @computed_boards.size == boards.size
         break
       end
     end
@@ -20,22 +38,13 @@ class PartOne
 
   attr_reader :input
 
-  def flip_numbers(n)
-    boards.each.with_index do |board, index|
-      if board.key?(n)
-        board[n] = { checked: true, coord: board[n][:coord] }
-      end
-    end
-  end
+  def boards
+    @boards ||= begin
+      input.split("\n\n").drop(1).map { _1.lines.map(&:chomp) }.map do |board|
+        rows = board.map { _1.split(' ').map(&:to_i) }
+        columns = rows.transpose
 
-  def any_boards?(n)
-    valid_board = boards.find do |board|
-      checked_numbers = board.select { _2[:checked] }
-
-      if checked_numbers.map { _2[:coord] }.transpose.map(&:tally).any? { |v| v.values.any? { _1 == @board_length } }
-        return board.select { !_2[:checked] }.keys.sum * n
-      else
-        false
+        [rows, columns].flatten(1)
       end
     end
   end
@@ -43,60 +52,12 @@ class PartOne
   def numbers
     @numbers ||= input.lines.first.chomp.split(",").map(&:to_i)
   end
-
-  def boards
-    @boards ||= begin
-      input.split("\n\n").drop(1).map(&:chomp).map { _1.lines.map(&:chomp) }.map do
-        format_board(_1)
-      end
-    end
-  end
-
-  def format_board(board)
-    board.reduce({}) do |b, n|
-      rows = board.map { _1.split(' ') }
-
-      rows.map.with_index do |row, y|
-        row.map.with_index do |value, x|
-          @board_length = [x + 1, y + 1, @board_length].max
-          b[value.to_i] = { checked: false, coord: [x,y] }
-        end
-      end
-
-      b
-    end
-  end
 end
 
 class PartTwo < PartOne
   def solution
-    @total_boards = boards.size
-    @winning_boards = []
-
-    numbers.each do |n|
-      flip_numbers(n)
-      if foo = winning_board?(n)
-        return foo
-        break
-      end
-    end
-  end
-
-  def winning_board?(n)
-    valid_board = boards.find.with_index do |board, index|
-      checked_numbers = board.select { _2[:checked] }
-
-      win = checked_numbers.map { _2[:coord] }.transpose.map(&:tally).any? { |v| v.values.any? { _1 == @board_length } }
-
-      if win && @total_boards - 1 == @winning_boards.uniq.size && !@winning_boards.include?(index)
-        return board.select { !_2[:checked] }.keys.sum * n
-      elsif win
-        @winning_boards << index
-        false
-      else
-        false
-      end
-    end
+    play
+    @computed_boards[@computed_boards.keys.last]
   end
 end
 
