@@ -9,9 +9,7 @@ class PartOne
   def solution
     fish = input.tally
 
-    (0..days).each do |d|
-      return fish.values.sum if d == days
-
+    days.times do
       new_fish = Hash.new(0)
 
       fish.each do |k, v|
@@ -25,6 +23,8 @@ class PartOne
 
       fish = new_fish
     end
+
+    fish.values.sum
   end
 
   private
