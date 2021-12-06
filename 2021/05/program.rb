@@ -7,7 +7,7 @@ class PartOne
   end
 
   def solution
-    compute_straight_lines
+    compute_lines(diagonal: false)
     @coordinates.count { _2 >= 2 }
   end
 
@@ -23,59 +23,15 @@ class PartOne
     end
   end
 
-  def straight_lines
-    @straight_lines ||= lines.select { |l| l[0][0] == l[1][0] || l[0][1] == l[1][1] }
-  end
-
-  def compute_straight_lines
-    straight_lines.each do |f|
+  def compute_lines(diagonal:)
+    lines.each do |f|
       x1, x2, y1, y2 = [f[0][0], f[1][0], f[0][1], f[1][1]]
 
-      if x1 == x2
-        start, finish = [y1, y2].sort
-        (start..finish).each do |i|
-          if @coordinates.key?([x1, i])
-            @coordinates[[x1, i]] += 1
-          else
-            @coordinates[[x1, i]] = 1
-          end
-        end
-      else
-        start, finish = [x1, x2].sort
-        (start..finish).each do |i|
-          if @coordinates.key?([i, y1])
-            @coordinates[[i, y1]] += 1
-          else
-            @coordinates[[i, y1]] = 1
-          end
-        end
-      end
-    end
-  end
-end
+      next if !diagonal && x1 != x2 && y1 != y2
 
-class PartTwo < PartOne
-  def solution
-    compute_straight_lines
-    compute_horizontal_lines
-    @coordinates.count { _2 >= 2 }
-  end
-
-  private
-
-  def horizontal_lines
-    @horizontal_lines ||= lines - straight_lines
-  end
-
-  def compute_horizontal_lines
-    horizontal_lines.each do |f|
-      x1, x2, y1, y2 = [f[0][0], f[1][0], f[0][1], f[1][1]]
-
-      x_start, x_finish = [x1, x2]
-      y_start, y_finish = [y1, y2]
-
-      x_s = x_start < x_finish ? (x_start..x_finish).to_a : x_start.downto(x_finish).to_a
-      y_s = y_start < y_finish ? (y_start..y_finish).to_a : y_start.downto(y_finish).to_a
+      length = [(x1 - x2).abs, (y1 - y2).abs].max + 1
+      x_s = generate_coord(x1, x2, length)
+      y_s = generate_coord(y1, y2, length)
 
       [x_s, y_s].transpose.each do |x|
         if @coordinates.key?(x)
@@ -85,6 +41,21 @@ class PartTwo < PartOne
         end
       end
     end
+  end
+
+  def generate_coord(a, b, length)
+    if a == b
+      Array.new(length, a)
+    else
+      a < b ? (a..b).to_a : a.downto(b).to_a
+    end
+  end
+end
+
+class PartTwo < PartOne
+  def solution
+    compute_lines(diagonal: true)
+    @coordinates.count { _2 >= 2 }
   end
 end
 
