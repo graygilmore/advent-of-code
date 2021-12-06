@@ -3,7 +3,7 @@ require './base'
 class PartOne
   def initialize(input = Base.raw_input('2021/05/input.txt'))
     @input = input
-    @coordinates = {}
+    @coordinates = Hash.new(0)
   end
 
   def solution
@@ -34,11 +34,7 @@ class PartOne
       y_s = generate_coord(y1, y2, length)
 
       [x_s, y_s].transpose.each do |x|
-        if @coordinates.key?(x)
-          @coordinates[x] += 1
-        else
-          @coordinates[x] = 1
-        end
+        @coordinates[x] += 1
       end
     end
   end
