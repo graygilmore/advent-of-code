@@ -17,17 +17,7 @@ class PartOne
   def advance_day(fish, total, current)
     return fish if current == total
 
-    new_fish = {
-      0 => 0,
-      1 => 0,
-      2 => 0,
-      3 => 0,
-      4 => 0,
-      5 => 0,
-      6 => 0,
-      7 => 0,
-      8 => 0,
-    }
+    new_fish = Hash.new(0)
 
     fish.each do |k, v|
       if k == 0
@@ -39,12 +29,6 @@ class PartOne
     end
 
     advance_day(new_fish, total, current + 1)
-  end
-end
-
-class PartTwo < PartOne
-  def solution
-    0
   end
 end
 
