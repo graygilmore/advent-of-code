@@ -7,29 +7,29 @@ class PartOne
   end
 
   def solution
-    advance_day(input.tally, days, 0).values.sum
+    fish = input.tally
+
+    (0..days).each do |d|
+      return fish.values.sum if d == days
+
+      new_fish = Hash.new(0)
+
+      fish.each do |k, v|
+        if k == 0
+          new_fish[6] += v
+          new_fish[8] += v
+        else
+          new_fish[k - 1] += v
+        end
+      end
+
+      fish = new_fish
+    end
   end
 
   private
 
   attr_reader :input, :days
-
-  def advance_day(fish, total, current)
-    return fish if current == total
-
-    new_fish = Hash.new(0)
-
-    fish.each do |k, v|
-      if k == 0
-        new_fish[6] += v
-        new_fish[8] += v
-      else
-        new_fish[k - 1] += v
-      end
-    end
-
-    advance_day(new_fish, total, current + 1)
-  end
 end
 
 class Test < Minitest::Test
