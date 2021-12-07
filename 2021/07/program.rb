@@ -8,16 +8,13 @@ class PartOne
   def solution
     min, max = positions.minmax
 
-    least_fuel = nil
+    fuel_payloads = {}
 
     (min..max).each do |i|
-      new_fuel = positions.map { fuel_calculation(_1, i) }.sum
-      if !least_fuel || new_fuel < least_fuel
-        least_fuel = new_fuel
-      end
+      fuel_payloads[i] = positions.map { fuel_calculation(_1, i) }.sum
     end
 
-    least_fuel
+    fuel_payloads.values.min
   end
 
   private
