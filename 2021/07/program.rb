@@ -11,7 +11,7 @@ class PartOne
     least_fuel = nil
 
     (min..max).each do |i|
-      new_fuel = positions.map { (_1 - i).abs }.sum
+      new_fuel = positions.map { fuel_calculation(_1, i) }.sum
       if !least_fuel || new_fuel < least_fuel
         least_fuel = new_fuel
       end
@@ -27,26 +27,18 @@ class PartOne
   def positions
     @positions ||= input.chomp.split(',').map(&:to_i)
   end
+
+  def fuel_calculation(v, i)
+    (v - i).abs
+  end
 end
 
 class PartTwo < PartOne
-  def solution
-    min, max = positions.minmax
+  private
 
-    least_fuel = nil
-
-    (min..max).each do |i|
-      new_fuel = positions.map {
-        v = (_1 - i).abs
-        (v * (v + 1)) / 2
-      }.sum
-
-      if !least_fuel || new_fuel < least_fuel
-        least_fuel = new_fuel
-      end
-    end
-
-    least_fuel
+  def fuel_calculation(v, i)
+    n = (v - i).abs
+    (n * (n + 1)) / 2
   end
 end
 
