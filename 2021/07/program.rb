@@ -37,7 +37,8 @@ class PartTwo < PartOne
 
     (min..max).each do |i|
       new_fuel = positions.map {
-        (1..(_1 - i).abs).to_a.sum
+        v = (_1 - i).abs
+        (v * (v + 1)) / 2
       }.sum
 
       if !least_fuel || new_fuel < least_fuel
