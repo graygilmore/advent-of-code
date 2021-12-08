@@ -34,19 +34,40 @@ end
 class PartTwo < PartOne
   def solution
     lines.sum do |segment, code|
-      one = segment.find { _1.size == 2 }
-      four = segment.find { _1.size == 4 }
-      seven = segment.find { _1.size == 3 }
-      eight = segment.find { _1.size == 7 }
+      one = segment.find { _1.size == 2 }.split('')
+      four = segment.find { _1.size == 4 }.split('')
+      seven = segment.find { _1.size == 3 }.split('')
+      eight = segment.find { _1.size == 7 }.split('')
+      six, nine = segment.select{ _1.size == 6 }.map{ |v| v.split('') }
+
+      top = seven - four
+      top_right = (six - nine | nine - six) & one
+      bottom_left = (six - nine | nine - six) - top_right
+      bottom_right = seven - top - top_right
+      bottom = five - top - bottom_right - four
+
+      three = segment.select { _1.size == 5 && }
+
+      top_left = six - nine - top_right
+      middle = four - one - top_left
+      bottom_right = four - top_left - middle - top_right
+
+      five = segment.find { _1.size == 5 && !top_right.include?(_1) }.split('')
+      two = segment.find { _1.size == 5 && !_1.include?(bottom_right) }
+
+      bottom = five - top - top_left - middle - bottom_right
+      bottom_left = two - top - top_right - middle - bottom
 
       map = {
-        top: [seven, eight] - one,
-        middle: [four, eight],
-        bottom: [eight],
-        top_left: [four, eight],
-        top_right: [one, four, seven, eight],
-        bottom_left: [eight],
-        bottom_right: [one, four, seven, eight],
+        [top_right + bottom_right] => 1,
+        [top + top_right + middle + bottom_left + bottom] => 2,
+        [top + top_right + middle + bottom_right + bottom] => 3,
+        [top_left + middle + top_right + bottom_right] => 4,
+        [top + top_left + middle + bottom_right + bottom] => 5,
+        [top + top_left + middle + bottom_right + bottom + bottom_left] => 6,
+        [top + top_right + bottom_right] => 7,
+        [top + top_right + top_left + middle + bottom_left + bottom_right + bottom] => 8,
+        [top + top_left + top_right + middle + bottom_right + bottom] => 9,
       }
 
       binding.pry
