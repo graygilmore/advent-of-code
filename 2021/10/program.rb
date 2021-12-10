@@ -7,7 +7,12 @@ class PartOne
 
   def solution
     lines.map do |line|
-      find_broken_line(line, 0)[0]
+      begin
+        build_stack(line)
+        nil
+      rescue => e
+        scores[e.message]
+      end
     end.compact.sum
   end
 
@@ -15,41 +20,35 @@ class PartOne
 
   attr_reader :input
 
-  def find_broken_line(line, index)
-    if closing.include?(line[index]) && line[index-1] == matching_opening[line[index]]
-      chars = line.chars
-      chars.delete_at(index - 1)
-      chars.delete_at(index - 1)
-      line = chars.join()
-      find_broken_line(line, index - 1)
-    elsif closing.include?(line[index]) && line[index-1] != matching_opening[line[index]]
-      return [scores[line[index]], line]
-    elsif line.size == index
-      return [nil, line]
-    else
-      find_broken_line(line, index + 1)
+  def build_stack(line)
+    stack = []
+
+    line.chars.each do |char|
+      if pairs.key?(char)
+        closed = stack.pop
+
+        unless pairs[char] == closed
+          raise char
+        end
+      else
+        stack.push(char)
+      end
     end
+
+    stack
   end
 
   def lines
     @lines ||= input.lines.map(&:chomp)
   end
 
-  def matching_opening
-    {
+  def pairs
+    @pairs ||= {
       ")" => "(",
       "]" => "[",
       "}" => "{",
       ">" => "<",
     }
-  end
-
-  def closing
-    [")", "]", "}", ">"]
-  end
-
-  def opening
-    ["(", "[", "{", "<"]
   end
 
   def scores
@@ -64,16 +63,17 @@ end
 
 class PartTwo < PartOne
   def solution
-    incomplete_lines = lines.map do
-      k, v = find_broken_line(_1, 0)
-      if k.nil?
-        v
+    incomplete_lines = lines.map do |line|
+      begin
+        build_stack(line)
+      rescue => e
+        nil
       end
     end.compact
 
     scored_lines = incomplete_lines.map do |line|
-      line.chars.reverse.reduce(0) do |cur, char|
-        cur * 5 + scores[matching_closing[char]]
+      line.reverse.reduce(0) do |current, char|
+        current * 5 + scores[pairs.key(char)]
       end
     end
 
@@ -88,15 +88,6 @@ class PartTwo < PartOne
       "]" => 2,
       "}" => 3,
       ">" => 4,
-    }
-  end
-
-  def matching_closing
-    {
-      "(" => ")",
-      "[" => "]",
-      "{" => "}",
-      "<" => ">",
     }
   end
 end
