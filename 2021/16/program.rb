@@ -55,8 +55,93 @@ class PartOne
 end
 
 class PartTwo < PartOne
-  def solution
+  class Packet
+    def initialize(bits)
+      @bits = bits
+      @version = bits.slice!(0, 3).to_i(2)
+      @type_id = bits.slice!(0, 3).to_i(2)
+      @value = compute_value
+    end
+    attr_reader :bits, :version, :type_id, :value
 
+    private
+
+    def literal_value
+      return unless type_id == 4
+
+      @literal_value ||= begin
+        number = ""
+        loop do
+          next_five = bits.slice!(0, 5)
+          number << next_five
+          break if next_five[0] == "0"
+        end
+        number.to_i(2)
+      end
+    end
+
+    def length_type_id
+      @length_type_id ||= bits.slice!(0)
+    end
+
+    def subpacket_length
+      @subpacket_length ||= begin
+        bits_to_check = length_type_id == "0" ? 15 : 11
+        bits.slice!(0, bits_to_check).to_i(2)
+      end
+    end
+
+    def subpackets
+      @subpackets ||= begin
+        packets = []
+
+        if length_type_id == "0"
+          remaining_bits = bits.slice!(0, subpacket_length)
+
+          while remaining_bits.length > 0
+            packet = Packet.new(remaining_bits)
+            packets << packet
+            remaining_bits = packet.bits
+          end
+        else
+          packets_to_build = subpacket_length
+          packets_to_build.times do
+            packet = Packet.new(bits)
+            packets << packet
+            bits = packet.bits
+          end
+        end
+
+        packets
+      end
+    end
+
+    def compute_value
+      return literal_value if type_id == 4
+
+      subpacket_values = subpackets.map { |p| p.value }
+
+      case type_id
+      when 0
+        subpacket_values.sum
+      when 1
+        subpacket_values.reduce(:*)
+      when 2
+        subpacket_values.min
+      when 3
+        subpacket_values.max
+      when 5
+        subpacket_values[0] > subpacket_values[1] ? 1 : 0
+      when 6
+        subpacket_values[0] < subpacket_values[1] ? 1 : 0
+      when 7
+        subpacket_values[0] == subpacket_values[1] ? 1 : 0
+      end
+    end
+  end
+
+  def solution
+    Packet.new([input].pack('H*').unpack('B*').first).value
   end
 
   private
