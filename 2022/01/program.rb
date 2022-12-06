@@ -22,7 +22,7 @@ end
 
 class PartTwo < PartOne
   def solution
-    0
+    elves.sort.reverse[0..2].sum
   end
 end
 
@@ -33,8 +33,8 @@ class Test < Minitest::Test
   end
 
   def test_part_two
-    assert_equal 0, PartTwo.new(input).solution
-    assert_equal 0, PartTwo.new.solution
+    assert_equal 45000, PartTwo.new(input).solution
+    assert_equal 207968, PartTwo.new.solution
   end
 
   def input
