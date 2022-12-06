@@ -1,7 +1,7 @@
 require './base'
 
 class PartOne
-  def initialize(input = Base.raw_input('2021/#DAY#/input.txt'))
+  def initialize(input = Base.raw_input('2022/#DAY#/input.txt'))
     @input = input
   end
 
