@@ -43,7 +43,19 @@ end
 
 class PartTwo < PartOne
   def solution
-    0
+    badges.sum
+  end
+
+  private
+
+  def badges
+    input.lines.map(&:chomp).each_slice(3).to_a.map do |group|
+      p1, p2, p3 = group
+
+      common_item = (p1.chars & p2.chars & p3.chars)[0]
+
+      priorities[common_item]
+    end.compact
   end
 end
 
@@ -54,8 +66,8 @@ class Test < Minitest::Test
   end
 
   def test_part_two
-    assert_equal 0, PartTwo.new(input).solution
-    assert_equal 0, PartTwo.new.solution
+    assert_equal 70, PartTwo.new(input).solution
+    assert_equal 2805, PartTwo.new.solution
   end
 
   def input
