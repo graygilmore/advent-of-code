@@ -41,7 +41,17 @@ end
 
 class PartTwo < PartOne
   def solution
-    0
+    overlapping_pairs
+  end
+
+  private
+
+  def overlapping_pairs
+    pairs.count do |pair|
+      elf1, elf2 = pair
+
+      (elf1.to_a & elf2.to_a).any?
+    end
   end
 end
 
@@ -52,8 +62,8 @@ class Test < Minitest::Test
   end
 
   def test_part_two
-    assert_equal 0, PartTwo.new(input).solution
-    assert_equal 0, PartTwo.new.solution
+    assert_equal 4, PartTwo.new(input).solution
+    assert_equal 903, PartTwo.new.solution
   end
 
   def input
