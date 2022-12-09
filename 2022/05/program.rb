@@ -60,7 +60,18 @@ end
 
 class PartTwo < PartOne
   def solution
-    0
+    stackies = stacks
+
+    moves.each do |move|
+      amount, from, to = move
+
+      take = stackies[from - 1].slice!(-amount, amount)
+
+      stackies[to - 1] << take
+      stackies[to - 1].flatten!
+    end
+
+    stackies.map(&:last).join('')
   end
 end
 
@@ -71,8 +82,8 @@ class Test < Minitest::Test
   end
 
   def test_part_two
-    assert_equal 0, PartTwo.new(input).solution
-    assert_equal 0, PartTwo.new.solution
+    assert_equal "MCD", PartTwo.new(input).solution
+    assert_equal "DMRDFRHHH", PartTwo.new.solution
   end
 
   def input
