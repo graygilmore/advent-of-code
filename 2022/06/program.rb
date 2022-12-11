@@ -22,7 +22,15 @@ end
 
 class PartTwo < PartOne
   def solution
-    0
+    input.index(marker) + 14
+  end
+
+  private
+
+  def marker
+    input.chars.each_cons(14).detect do |x|
+      x.uniq.size === x.size
+    end.join("")
   end
 end
 
@@ -37,11 +45,11 @@ class Test < Minitest::Test
   end
 
   def test_part_two
-    assert_equal 0, PartTwo.new(input).solution
-    assert_equal 0, PartTwo.new.solution
-  end
-
-  def input
-    "mjqjpqmgbljsphdztnvjfqwrcgsmlb"
+    assert_equal 19, PartTwo.new("mjqjpqmgbljsphdztnvjfqwrcgsmlb").solution
+    assert_equal 23, PartTwo.new("bvwbjplbgvbhsrlpgdmjqwftvncz").solution
+    assert_equal 23, PartTwo.new("nppdvjthqldpwncqszvftbrmjlhg").solution
+    assert_equal 29, PartTwo.new("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg").solution
+    assert_equal 26, PartTwo.new("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw").solution
+    assert_equal 3380, PartTwo.new.solution
   end
 end
