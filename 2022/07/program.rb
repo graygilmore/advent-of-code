@@ -81,7 +81,21 @@ end
 
 class PartTwo < PartOne
   def solution
-    0
+    total_space = 70000000
+    needed_space = 30000000
+    root_dir_space = sum_folder(["/"], folders[["/"]])
+    unused_space = total_space - root_dir_space
+    amount_to_delete = 30000000 - unused_space
+    sums = []
+
+    folders.each do |folder|
+      f_sum = sum_folder(folder[0], folder[1])
+      if f_sum >= amount_to_delete
+        sums.push(f_sum)
+      end
+    end
+
+    sums.min
   end
 end
 
@@ -92,8 +106,8 @@ class Test < Minitest::Test
   end
 
   def test_part_two
-    assert_equal 0, PartTwo.new(input).solution
-    assert_equal 0, PartTwo.new.solution
+    assert_equal 24933642, PartTwo.new(input).solution
+    assert_equal 12785886, PartTwo.new.solution
   end
 
   def input
