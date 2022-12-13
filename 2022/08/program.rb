@@ -45,7 +45,59 @@ end
 
 class PartTwo < PartOne
   def solution
-    0
+    scenic_scores.max
+  end
+
+  private
+
+  def scenic_scores
+    (1..(trees.size-2)).map do |y|
+      (1..(trees.size - 2)).map do |x|
+        tree_score(x, y)
+      end
+    end.flatten
+  end
+
+  def tree_score(x, y)
+    up(x, y) * left(x, y) * down(x, y) * right(x, y)
+  end
+
+  def up(x, y)
+    view((0..y-1).to_a.reverse.map { |ny| trees[ny][x] }, trees[y][x])
+  end
+
+  def down(x, y)
+    view((y+1..trees.size-1).to_a.map { |ny| trees[ny][x] }, trees[y][x])
+  end
+
+  def right(x, y)
+    view((x+1..trees.size-1).to_a.map { |nx| trees[y][nx] }, trees[y][x])
+  end
+
+  def left(x, y)
+    view((0..x-1).to_a.reverse.map { |nx| trees[y][nx] }, trees[y][x])
+  end
+
+  def view(ts, consideration)
+    count = 0
+
+    if ts.size == 1
+      return 1
+    end
+
+    ts.each do |t|
+      if t == consideration
+        count += 1
+        break
+      elsif t < consideration
+        count += 1
+      else
+        count += 1
+        break
+      end
+    end
+
+    count
   end
 end
 
@@ -56,8 +108,8 @@ class Test < Minitest::Test
   end
 
   def test_part_two
-    assert_equal 0, PartTwo.new(input).solution
-    assert_equal 0, PartTwo.new.solution
+    assert_equal 8, PartTwo.new(input).solution
+    assert_equal 291840, PartTwo.new.solution
   end
 
   def input
