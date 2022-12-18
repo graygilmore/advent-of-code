@@ -4,7 +4,7 @@ printf -v day "%02d" $1
 
 mkdir 2022/$day
 cp template.rb 2022/$day/program.rb
-sed -i "s/#DAY#/$day/g" 2022/$day/program.rb
+sed -i "" -e "s/#DAY#/$day/g" 2022/$day/program.rb
 
 touch 2022/$day/input.txt
 
