@@ -38,7 +38,25 @@ end
 
 class PartTwo < PartOne
   def solution
-    0
+    sprite_position = 1
+    cycles = 0
+    crt = ""
+
+    input.lines.map(&:chomp).each do |ins|
+      command, value = ins.split(" ")
+      cycles_to_run = command == "noop" ? 1 : 2
+
+      cycles_to_run.times do
+        crt += (sprite_position-1..sprite_position+1).include?(cycles % 40) ? "#" : "."
+        cycles += 1
+      end
+
+      if command == "addx"
+        sprite_position += value.to_i
+      end
+    end
+
+    crt.chars.each_slice(40).map(&:join).join("\n")
   end
 end
 
@@ -49,8 +67,30 @@ class Test < Minitest::Test
   end
 
   def test_part_two
-    assert_equal 0, PartTwo.new(input).solution
-    assert_equal 0, PartTwo.new.solution
+    assert_equal part_two_test_image.chomp, PartTwo.new(input).solution
+    assert_equal part_two_real_image.chomp, PartTwo.new.solution
+  end
+
+  def part_two_test_image
+    <<~IMAGE
+      ##..##..##..##..##..##..##..##..##..##..
+      ###...###...###...###...###...###...###.
+      ####....####....####....####....####....
+      #####.....#####.....#####.....#####.....
+      ######......######......######......####
+      #######.......#######.......#######.....
+    IMAGE
+  end
+
+  def part_two_real_image
+    <<~IMAGE
+      ###..#..#.#....#..#...##..##..####..##..
+      #..#.#..#.#....#..#....#.#..#....#.#..#.
+      #..#.####.#....####....#.#......#..#..#.
+      ###..#..#.#....#..#....#.#.##..#...####.
+      #....#..#.#....#..#.#..#.#..#.#....#..#.
+      #....#..#.####.#..#..##...###.####.#..#.
+    IMAGE
   end
 
   def input
