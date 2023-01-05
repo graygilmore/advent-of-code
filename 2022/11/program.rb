@@ -75,7 +75,53 @@ end
 
 class PartTwo < PartOne
   def solution
-    0
+    @rounds.times do |round|
+      @monkeys.each do |monkey|
+        item_count = monkey.items.size
+        item_count.times do
+          monkey.inspect_item
+          removed_item, next_monkey = monkey.test_item
+          @monkeys[next_monkey].items << removed_item
+        end
+      end
+    end
+
+    @monkeys.map(&:inspections).max(2).inject(:*)
+  end
+
+  private
+
+  def format_monkeys
+    super_modulo = input.scan(/Test: divisible by (\d+)/).flatten.map(&:to_i).inject(:*)
+
+    input.split("\n\n").map(&:lines).map.with_index do |info, index|
+      initial_items = info[1].scan(/(\d+)/).flatten.map(&:to_i)
+      operation, value = info[2].strip.split("Operation: ")[1].scan(/new = old (\+|\*) (\d+|old)/).flatten
+      division_check = info[3].strip.match(/\d+/)[0].to_i
+      true_monkey = info[4].strip.match(/\d+/)[0].to_i
+      false_monkey = info[5].strip.match(/\d+/)[0].to_i
+
+      monkey = Monkey.new(items: initial_items)
+      if operation == "+"
+        monkey.create_method("inspect_item") do
+          monkey.inspections += 1
+          items[0] += value == "old" ? items[0] : value.to_i
+        end
+      else
+        monkey.create_method("inspect_item") do
+          monkey.inspections += 1
+          items[0] *= value == "old" ? items[0] : value.to_i
+        end
+      end
+
+      monkey.create_method("test_item") do
+        item = monkey.items.shift
+        next_monkey = item % division_check == 0 ? true_monkey : false_monkey
+        [item % super_modulo, next_monkey]
+      end
+
+      @monkeys << monkey
+    end
   end
 end
 
@@ -86,8 +132,8 @@ class Test < Minitest::Test
   end
 
   def test_part_two
-    assert_equal 0, PartTwo.new(input).solution
-    assert_equal 0, PartTwo.new.solution
+    assert_equal 2713310158, PartTwo.new(input, rounds: 10_000).solution
+    assert_equal 17408399184, PartTwo.new(rounds: 10_000).solution
   end
 
   def input
